@@ -10,7 +10,7 @@
 
 # Skills For Real Engineers
 
-[![skills.sh](https://skills.sh/b/mattpocock/skills)](https://skills.sh/mattpocock/skills)
+[中文版本：codingrock](https://github.com/teoking/skills/tree/codingrock)
 
 My agent skills that I use every day to do real engineering - not vibe coding.
 
@@ -22,9 +22,29 @@ If you want to keep up with changes to these skills, and any new ones I create, 
 
 [Sign Up To The Newsletter](https://www.aihero.dev/s/skills-newsletter)
 
+## 中文入口
+
+本地中文试点已覆盖需求澄清、故障诊断和技能编写。默认用简体中文交互，英文技能标识、命令和路径保持稳定；其他技能仍保留上游内容。范围、安装来源说明、上游基线和验收用例见 [中文维护指南](./LOCALIZATION.md)。下方安装命令从 `git@github.com:teoking/skills.git` 的 `codingrock` 分支获取已推送的中文版本；`main` 与上游一致，未做中文优化。
+
+### User-invoked（仅用户主动调用）
+
+- [需求澄清入口 `grill-me`](./skills/productivity/grill-me/SKILL.md)：手动入口，内部依赖 `grilling`；入口本身暂未翻译，调用限制保持不变。
+
+### Model-invoked（模型或用户均可调用）
+
+| 中文名称 | 技能标识 | 可以这样说 |
+| --- | --- | --- |
+| 需求澄清 | [grilling](./skills/productivity/grilling/SKILL.md) | 帮我把需求问清楚，挑战一下方案中的假设 |
+| 故障诊断 | [diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md) | 帮我排查这个偶发 bug，并验证修复 |
+| 技能与指令编写 | [writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md) | 帮我改进这个技能的触发条件和完成标准 |
+
+中文显示名称不创建中文命令别名；显式调用方式由宿主决定。
+
 ## Installation (30-second setup)
 
-A plugin updates itself. [skills.sh](https://skills.sh/mattpocock/skills) copies editable files into your project, and you update them by hand. Pick one per agent, because installing both gives you every skill twice.
+先配置 GitHub SSH 访问。以下命令固定安装 `codingrock` 分支已推送的提交；已有上游副本时，先通过宿主的插件管理器移除，再启用本 fork，避免同名技能重复。
+
+插件安装使用本 fork 的 marketplace。 [skills.sh](https://skills.sh) copies editable files into your project, and you update them by hand. Pick one per agent, because installing both gives you every skill twice.
 
 ### 1. Get the skills
 
@@ -32,10 +52,11 @@ A plugin updates itself. [skills.sh](https://skills.sh/mattpocock/skills) copies
 <summary><strong>Claude Code</strong></summary>
 
 ```bash
-claude plugin install mattpocock-skills@claude-plugins-official
+claude plugin marketplace add "git@github.com:teoking/skills.git#codingrock"
+claude plugin install mattpocock-skills@teoking
 ```
 
-Updates itself by default.
+使用本 fork 的 `teoking` marketplace；更新方式以宿主的插件设置为准。
 
 </details>
 
@@ -43,11 +64,11 @@ Updates itself by default.
 <summary><strong>Codex</strong></summary>
 
 ```bash
-codex plugin marketplace add mattpocock/skills
-codex plugin add mattpocock-skills@mattpocock
+codex plugin marketplace add git@github.com:teoking/skills.git --ref codingrock
+codex plugin add mattpocock-skills@teoking
 ```
 
-Updates itself at startup.
+使用本 fork 的 `teoking` marketplace；更新方式以宿主的插件设置为准。
 
 </details>
 
@@ -55,21 +76,14 @@ Updates itself at startup.
 <summary><strong>GitHub Copilot</strong> (CLI and VS Code)</summary>
 
 ```bash
-copilot plugin marketplace add mattpocock/skills
-copilot plugin install mattpocock-skills@mattpocock
+git clone --branch codingrock --single-branch git@github.com:teoking/skills.git skills-codingrock
+copilot plugin marketplace add ./skills-codingrock
+copilot plugin install mattpocock-skills@teoking
 ```
 
-Then, once, add to `~/.copilot/settings.json`:
+保留 `skills-codingrock` 检出目录。更新时先运行 `git -C skills-codingrock pull --ff-only`，再通过宿主插件管理器更新插件；本地来源不会自行拉取远端分支。
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "mattpocock": { "source": { "source": "github", "repo": "mattpocock/skills" }, "autoUpdate": true }
-  }
-}
-```
-
-In VS Code, run **Chat: Install Plugin From Source** and enter `https://github.com/mattpocock/skills`. It updates daily.
+In VS Code, run **Chat: Install Plugin From Source** and enter `git@github.com:teoking/skills.git#codingrock`.
 
 </details>
 
@@ -77,11 +91,12 @@ In VS Code, run **Chat: Install Plugin From Source** and enter `https://github.c
 <summary><strong>Gemini CLI</strong> (manual updates)</summary>
 
 ```bash
-gemini skills install https://github.com/mattpocock/skills.git --path skills/engineering
-gemini skills install https://github.com/mattpocock/skills.git --path skills/productivity
+git clone --branch codingrock --single-branch git@github.com:teoking/skills.git skills-codingrock
+gemini skills install ./skills-codingrock/skills/engineering
+gemini skills install ./skills-codingrock/skills/productivity
 ```
 
-Re-run both commands to update.
+更新时先运行 `git -C skills-codingrock pull --ff-only`，再重复两条 `gemini skills install` 命令。已有检出目录时跳过 clone，并确认其分支为 `codingrock`。
 
 </details>
 
@@ -89,10 +104,10 @@ Re-run both commands to update.
 <summary><strong>Any other agent, or editable files</strong> (manual updates)</summary>
 
 ```bash
-npx skills@latest add mattpocock/skills -a <agent>  # cursor, opencode, devin, windsurf, amp, pi; omit -a to choose
+npx skills@latest add "git@github.com:teoking/skills.git#codingrock" -a <agent>  # cursor, opencode, devin, windsurf, amp, pi; omit -a to choose
 ```
 
-When the installer asks which skills to take, include `setup-matt-pocock-skills`. To update, run `npx skills@latest update`, and re-run `add` to pick up new skills.
+When the installer asks which skills to take, include `setup-matt-pocock-skills`. To update, re-run the same `add` command with `#codingrock`, preserving the branch selection and picking up new skills.
 
 </details>
 
@@ -231,7 +246,7 @@ Skills I use daily for code work.
 **Model-invoked**
 
 - **[prototype](./skills/engineering/prototype/SKILL.md)**: Build a throwaway prototype to answer a design question, either a single shareable HTML file for state/logic questions, or several radically different UI variations toggleable from one route.
-- **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test.
+- **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: 故障诊断：建立能捕获具体缺陷的反馈循环，依次最小化、验证假设、增加观测、修复并回归检查。
 - **[research](./skills/engineering/research/SKILL.md)**: Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, run as a background agent.
 - **[tdd](./skills/engineering/tdd/SKILL.md)**: Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
 - **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)**: Actively build and sharpen a project's domain model: challenge terms against the glossary, stress-test with edge-case scenarios, and update `GLOSSARY.md` and ADRs inline.
@@ -254,5 +269,5 @@ General workflow tools, not code-specific.
 
 **Model-invoked**
 
-- **[grilling](./skills/productivity/grilling/SKILL.md)**: Interview the user relentlessly about a plan, decision, or idea until every branch of the design tree is resolved. The reusable interview primitive behind `grill-me`, `grill-with-docs`, `triage`, `wayfinder` and `improve-codebase-architecture`.
-- **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)**: Writing documents for agents: skills, AGENTS.md/CLAUDE.md, and any doc an agent reaches by a pointer.
+- **[grilling](./skills/productivity/grilling/SKILL.md)**: 需求澄清：按设计树逐轮提问，查明事实、等待用户决策，直到双方确认理解一致。
+- **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)**: 技能与指令编写：面向 agent 编写技能、AGENTS.md / CLAUDE.md 与按需读取的参考文档。

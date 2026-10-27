@@ -1,10 +1,10 @@
 {
-  "name": "mattpocock",
+  "name": "teoking",
   "owner": {
-    "name": "Matt Pocock",
-    "url": "https://www.aihero.dev"
+    "name": "teoking",
+    "url": "https://github.com/teoking"
   },
-  "description": "Matt Pocock's skills for real engineering, as an installable Claude Code plugin.",
+  "description": "teoking 的中文友好技能库，基于 Matt Pocock 的工程技能。",
   "plugins": [
     {
       "name": "mattpocock-skills",

@@ -2,34 +2,24 @@
 
 One install story, one wording. `README.md`, `.changeset/*`, and every page under `docs/` must say **this** and nothing else. Change it here first, then propagate.
 
-## Managed installs first
+## Fork installation source
 
-Lead with installs that update themselves. Fall back to skills.sh, labelled "manual updates", only for agents that have no such install. Call a route managed only if it updates without the user running a command. Put any one-time opt-in beside its install command. Never promise "instant".
+All installation routes use the `codingrock` branch of `git@github.com:teoking/skills.git`. The `main` branch mirrors upstream and does not contain the Chinese customizations. Configure GitHub SSH access first. These commands install pushed commits, not uncommitted local changes.
 
-Claude Code installs from its official marketplace, `claude-plugins-official`. Every other managed route installs from this repo's own marketplace, `.claude-plugin/marketplace.json` and `plugin.json`. Those routes reinstall only when the `version` in `plugin.json` changes. The Release workflow runs `npm run version`, which copies that field from `package.json`, so users get a release when the "chore: version skills" PR merges.
+Claude Code, Codex and Copilot use this repository's `teoking` marketplace. The plugin retains its name `mattpocock-skills`; install it as `mattpocock-skills@teoking`. The official marketplace and `@mattpocock` remain upstream sources.
 
-| Agent         | Route                            | Updates itself?                                                  |
-| ------------- | -------------------------------- | ---------------------------------------------------------------- |
-| Claude Code   | `@claude-plugins-official`       | Yes, by default                                                  |
-| Codex         | `@mattpocock` marketplace        | Yes, at startup, by default                                      |
-| Copilot CLI   | `@mattpocock` marketplace        | Yes, after a one-time `autoUpdate: true`                         |
-| VS Code       | Chat: Install Plugin From Source | Yes, daily, by default                                           |
-| Gemini CLI    | `gemini skills install` (copies) | No. A Gemini extension would need a flat `skills/<name>/` layout |
-| Everyone else | skills.sh                        | No. Run `npx skills update`, and re-run `add` for new skills     |
-
-Sources (2026-10-08): Codex `core-plugins/src/manager.rs`; Copilot [cli-config-dir-reference](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-config-dir-reference); VS Code `pluginAutoUpdate.ts`; Gemini `skillLoader.ts`.
-
-Nobody has run Auggie, Droid, Qwen or Goose against this repo, so they stay on skills.sh until someone does.
+Choose one source per agent. Remove an existing upstream copy through the host's plugin manager before enabling the fork, so identical skill names do not appear twice. Automatic updates depend on host settings; a new commit alone does not guarantee an installed plugin update. The plugin version remains synced with `package.json` through `npm run version`.
 
 ## Claude Code
 
 <canonical-block name="claude-code">
 
 ```bash
-claude plugin install mattpocock-skills@claude-plugins-official
+claude plugin marketplace add "git@github.com:teoking/skills.git#codingrock"
+claude plugin install mattpocock-skills@teoking
 ```
 
-Updates itself by default.
+使用本 fork 的 `teoking` marketplace；更新方式以宿主的插件设置为准。
 
 </canonical-block>
 
@@ -38,65 +28,59 @@ Updates itself by default.
 <canonical-block name="codex">
 
 ```bash
-codex plugin marketplace add mattpocock/skills
-codex plugin add mattpocock-skills@mattpocock
+codex plugin marketplace add git@github.com:teoking/skills.git --ref codingrock
+codex plugin add mattpocock-skills@teoking
 ```
 
-Updates itself at startup.
+使用本 fork 的 `teoking` marketplace；更新方式以宿主的插件设置为准。
 
 </canonical-block>
 
 ## GitHub Copilot (CLI and VS Code)
 
-Use the marketplace, not `copilot plugin install mattpocock/skills`. Copilot has deprecated direct repo installs, and they can't auto-update. The `extraKnownMarketplaces` entry follows the documented schema, but nobody has run it yet.
+Use the fork marketplace. The SSH installation path has not been exercised against a live remote in this workspace.
 
 <canonical-block name="copilot">
 
 ```bash
-copilot plugin marketplace add mattpocock/skills
-copilot plugin install mattpocock-skills@mattpocock
+git clone --branch codingrock --single-branch git@github.com:teoking/skills.git skills-codingrock
+copilot plugin marketplace add ./skills-codingrock
+copilot plugin install mattpocock-skills@teoking
 ```
 
-Then, once, add to `~/.copilot/settings.json`:
+保留 `skills-codingrock` 检出目录。更新时先运行 `git -C skills-codingrock pull --ff-only`，再通过宿主插件管理器更新插件；本地来源不会自行拉取远端分支。
 
-```json
-{
-  "extraKnownMarketplaces": {
-    "mattpocock": { "source": { "source": "github", "repo": "mattpocock/skills" }, "autoUpdate": true }
-  }
-}
-```
-
-In VS Code, run **Chat: Install Plugin From Source** and enter `https://github.com/mattpocock/skills`. It updates daily.
+In VS Code, run **Chat: Install Plugin From Source** and enter `git@github.com:teoking/skills.git#codingrock`.
 
 </canonical-block>
 
 ## Gemini CLI
 
-Gemini doesn't read `.claude-plugin`, and `--path` takes one bucket. One install per promoted bucket gives exactly the promoted set (27 skills, verified 2026-10-07).
+Clone the required branch first, then install the two promoted bucket directories. This avoids relying on a host-specific Git ref syntax.
 
 <canonical-block name="gemini">
 
 ```bash
-gemini skills install https://github.com/mattpocock/skills.git --path skills/engineering
-gemini skills install https://github.com/mattpocock/skills.git --path skills/productivity
+git clone --branch codingrock --single-branch git@github.com:teoking/skills.git skills-codingrock
+gemini skills install ./skills-codingrock/skills/engineering
+gemini skills install ./skills-codingrock/skills/productivity
 ```
 
-Re-run both commands to update.
+更新时先运行 `git -C skills-codingrock pull --ff-only`，再重复两条 `gemini skills install` 命令。已有检出目录时跳过 clone，并确认其分支为 `codingrock`。
 
 </canonical-block>
 
 ## Every other agent, or editable files (skills.sh)
 
-`-a` preselects the agent. Each agent in the comment was run on 2026-10-07. Prefer skills.sh to an agent's own repo installer, such as `amp skill add` or `pi install git:…`, because those also pull in `misc/` and `in-progress/`. `npx skills update` skips skills added upstream since `add`, so the block tells users to re-run `add`.
+`-a` preselects the agent. Each agent in the comment was run on 2026-10-07. Prefer skills.sh to an agent's own repo installer, such as `amp skill add` or `pi install git:…`, because those also pull in `misc/` and `in-progress/`. Re-run the branch-qualified `add` command for updates; do not substitute an unqualified repository URL.
 
 <canonical-block name="other-agents">
 
 ```bash
-npx skills@latest add mattpocock/skills -a <agent>  # cursor, opencode, devin, windsurf, amp, pi; omit -a to choose
+npx skills@latest add "git@github.com:teoking/skills.git#codingrock" -a <agent>  # cursor, opencode, devin, windsurf, amp, pi; omit -a to choose
 ```
 
-When the installer asks which skills to take, include `setup-matt-pocock-skills`. To update, run `npx skills@latest update`, and re-run `add` to pick up new skills.
+When the installer asks which skills to take, include `setup-matt-pocock-skills`. To update, re-run the same `add` command with `#codingrock`, preserving the branch selection and picking up new skills.
 
 </canonical-block>
 
@@ -105,11 +89,11 @@ Use the single-skill form wherever one skill is named on its own. `docs/` pages 
 <canonical-block name="skills-sh-one-skill">
 
 ```bash
-npx skills@latest add mattpocock/skills --skill=<name>
+npx skills@latest add "git@github.com:teoking/skills.git#codingrock" --skill=<name>
 ```
 
 ```bash
-npx skills@latest update <name>
+npx skills@latest add "git@github.com:teoking/skills.git#codingrock" --skill=<name>
 ```
 
 </canonical-block>
@@ -119,3 +103,7 @@ npx skills@latest update <name>
 ## The two routes are exclusive
 
 The plugin is a managed, read-only bundle you subscribe to. skills.sh writes files you own and edit. Installing both leaves the user with every skill twice: always say "pick one".
+
+## Branch syntax verification
+
+Codex's local `plugin marketplace add --help` documents `--ref`. The installed skills.sh parser supports Git URL fragments. Claude Code documents `#<ref>` in [Host a marketplace](https://code.claude.com/docs/en/plugins/host-marketplace), and VS Code documents it in [Agent plugins](https://code.visualstudio.com/docs/agent-customization/agent-plugins). Copilot CLI and Gemini use a Git checkout pinned to the branch, then their local-directory install route. Live SSH installs have not been run here.

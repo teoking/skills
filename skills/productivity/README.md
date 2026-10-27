@@ -16,5 +16,5 @@ Reachable only when you type them (Claude Code: `disable-model-invocation: true`
 
 Model- or user-reachable (rich trigger phrasing so the model can reach for them).
 
-- **[grilling](./grilling/SKILL.md)**: Interview the user relentlessly about a plan, decision, or idea until every branch of the design tree is resolved.
-- **[writing-for-agents](./writing-for-agents/SKILL.md)**: Writing documents for agents: skills, AGENTS.md/CLAUDE.md, and any doc an agent reaches by a pointer.
+- **[grilling](./grilling/SKILL.md)**: 需求澄清：按设计树逐轮提问，查明事实、等待用户决策，直到双方确认理解一致。
+- **[writing-for-agents](./writing-for-agents/SKILL.md)**: 技能与指令编写：面向 agent 编写技能、AGENTS.md / CLAUDE.md 与按需读取的参考文档。

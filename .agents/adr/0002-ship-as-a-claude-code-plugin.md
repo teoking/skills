@@ -51,3 +51,8 @@ On Codex 0.161.0, the `@mattpocock` marketplace install loads the promoted model
 `@mattpocock` is now the lead route on Codex, Copilot and VS Code, at the cost of a one-time opt-in on Copilot. Claude Code stays on `claude-plugins-official`, as in the 2026-08-05 update, because it auto-updates by default and needs no `marketplace add`.
 
 The version invariant above now applies to every managed route. `npm run version` already keeps it by running `scripts/sync-plugin-version.mjs`. `marketplace.json` has no `version` field, so it can't drift.
+
+
+## Fork update, 2026-10-27: install from teoking
+
+This fork installs from the `codingrock` branch of `git@github.com:teoking/skills.git`, including Claude Code. The `main` branch mirrors upstream and has no Chinese customizations. Its marketplace is named `teoking` to distinguish it from upstream. The plugin name remains `mattpocock-skills`, preserving skill identifiers and the promoted set. Earlier official-marketplace and `@mattpocock` guidance above records upstream history, not this fork's current installation route. Current commands live in [.agents/install-block.md](../install-block.md).

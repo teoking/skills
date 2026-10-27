@@ -6,8 +6,8 @@
     "name": "Matt Pocock",
     "url": "https://www.aihero.dev"
   },
-  "homepage": "https://www.aihero.dev/s/skills-newsletter",
-  "repository": "https://github.com/mattpocock/skills",
+  "homepage": "https://github.com/teoking/skills",
+  "repository": "git@github.com:teoking/skills.git",
   "license": "MIT",
   "keywords": [
     "engineering",
