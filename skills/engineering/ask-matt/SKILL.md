@@ -57,7 +57,7 @@ A starting situation that generates work, then merges onto the main flow.
 
 Not feature work, just upkeep.
 
-- **`/improve-codebase-architecture`** runs whenever you have a spare moment to keep the codebase good for agents to operate in. It surfaces **deepening opportunities**; picking one _generates an idea_ you can take into the main flow at `/grill-with-docs`. It's the survey that finds the candidates; **`/codebase-design`** (below) is the bench you design the chosen one on.
+- **`/improve-codebase-architecture`**（代码库架构改进，仅用户主动调用）用于定期维护，让代码库更适合 agent 理解和修改。它先生成中文 HTML 报告，展示**深化机会（deepening opportunities）**，等待用户选中候选方案后才逐轮访谈，不直接执行重构。选中的候选产生一个可带回 `/grill-with-docs` 主流程的想法。它负责调查并找出候选；**`/codebase-design`**（见下文）提供选定模块的设计词汇和方法。
 
 ## Vocabulary underneath
 

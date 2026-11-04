@@ -1,71 +1,73 @@
 ---
 name: improve-codebase-architecture
-description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+description: 扫描代码库中的模块深化机会，生成可视化 HTML 报告，再围绕用户选中的候选方案逐轮访谈。
 disable-model-invocation: true
 ---
 
-# Improve Codebase Architecture
+# 改进代码库架构
 
-Surface architectural friction and propose **deepening opportunities**: refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
+找出架构中阻碍理解、修改和测试的地方，提出**深化机会（deepening opportunities）**：通过重构将浅模块（shallow modules）变为深模块（deep modules）。目标是改善可测试性，让 AI 更容易理解和定位代码。
 
-This command is _informed_ by the project's domain model and built on a shared design vocabulary:
+默认使用简体中文提问、解释、生成报告和总结；用户指定其他语言时遵从用户。代码、命令、路径、工具名和技能标识保留原样，领域术语遵循目标项目约定。
 
-- Call the Skill tool with "codebase-design" for the architecture vocabulary (**module**, **interface**, **depth**, **seam**, **adapter**, **leverage**, **locality**) and its principles (the deletion test, "the interface is the test surface", "one adapter = hypothetical seam, two = real"). Use these terms exactly in every suggestion, and don't drift into "component," "service," "API," or "boundary."
-- The domain language in `GLOSSARY.md` gives names to good seams; ADRs in `docs/adr/` record decisions this command should not re-litigate.
+本命令以项目的领域模型为依据，并使用共享的设计词汇：
 
-## Process
+- 调用 Skill 工具，传入 `codebase-design`，获取架构词汇及其原则：**模块（module）**、**接口（interface）**、**深度（depth）**、**接缝（seam）**、**适配器（adapter）**、**杠杆效应（leverage）**、**局部性（locality）**，以及删除检验、接口就是测试面、一个适配器代表假设性的接缝而两个才代表真实接缝。中文建议统一使用这些译名，首次出现时附英文原词；英文建议使用原词。不要用「组件」「服务」「API」或「边界」替代这些架构术语。
+- `GLOSSARY.md` 中的领域语言用于为合适的接缝命名；`docs/adr/` 中的架构决策记录（ADR）记载了本命令不应重新争论的决策。
 
-### 1. Explore
+## 流程
 
-**Scope before you scan: YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:
+### 1. 探索
 
-- If the user named a direction (a module, a subsystem, a pain point), take it, and skip the inference below.
-- Otherwise, walk back a good stretch of the commit history (`git log --oneline`) to find the codebase's hot spots, the files and areas that keep coming up, and let those paths pull your attention first. If the changes are scattered with no clear hot spot, widen the net.
+**先确定扫描范围：YAGNI。** 深化模块的收益在于让后续修改更容易，因此应优先关注最近发生变化的代码。先决定看哪里，再开始探索：
 
-Read the project's domain glossary (`GLOSSARY.md`) and any ADRs in the area you're touching first.
+- 如果用户指定了方向，例如模块、子系统或痛点，就按这个方向探索，跳过下面的推断。
+- 否则，查看足够一段提交历史（`git log --oneline`），找出反复变化的文件和区域，优先关注这些热点。如果改动分散、没有明显热点，再扩大范围。
 
-Then spawn a sub-agent to walk the codebase. Don't follow rigid heuristics; explore organically and note where you experience friction:
+先读取项目的领域术语表（`GLOSSARY.md`），以及当前探索区域涉及的 ADR。
 
-- Where does understanding one concept require bouncing between many small modules?
-- Where are modules **shallow**, with an interface nearly as complex as the implementation?
-- Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
-- Where do tightly-coupled modules leak across their seams?
-- Which parts of the codebase are untested, or hard to test through their current interface?
+然后派一个子代理遍历代码库。不要套用僵硬的启发式规则；沿着实际代码探索，记录遇到的阻碍：
 
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
+- 理解一个概念，是否需要在许多小模块之间反复跳转？
+- 哪些模块是**浅模块**，接口几乎和实现一样复杂？
+- 哪些纯函数只是为了方便测试而被提取出来，真正的缺陷却藏在调用方式中，缺乏**局部性**？
+- 哪些紧耦合模块的实现细节跨接缝泄漏？
+- 哪些代码尚未测试，或难以通过当前接口测试？
 
-### 2. Present candidates as an HTML report
+对每个疑似浅模块应用**删除检验（deletion test）**：删除它之后，复杂度会集中起来，还是只是换个位置？「能集中复杂度」才是需要的信号。
 
-Write a self-contained HTML file to the OS temp directory so nothing lands in the repo. Resolve the temp dir from `$TMPDIR`, falling back to `/tmp` (or `%TEMP%` on Windows), and write to `<tmpdir>/architecture-review-<timestamp>.html` so each run gets a fresh file. Open it for the user (`xdg-open <path>` on Linux, `open <path>` on macOS, `start <path>` on Windows) and tell them the absolute path.
+### 2. 用 HTML 报告展示候选方案
 
-The report uses **Tailwind via CDN** for layout and styling, and **Mermaid via CDN** for diagrams where a graph/flow/sequence reliably communicates the structure. Mix Mermaid with hand-crafted CSS/SVG visuals: use Mermaid when relationships are graph-shaped (call graphs, dependencies, sequences), and hand-built divs/SVG when you want something more editorial (mass diagrams, cross-sections, collapse animations). Each candidate gets a **before/after visualisation**. Be visual.
+将报告写成单文件 HTML，保存在操作系统临时目录，不要写入仓库。从 `$TMPDIR` 解析临时目录；未设置时回退到 `/tmp`，Windows 则使用 `%TEMP%`。写入 `<tmpdir>/architecture-review-<timestamp>.html`，确保每次运行生成新文件。为用户打开文件：Linux 使用 `xdg-open <path>`，macOS 使用 `open <path>`，Windows 使用 `start <path>`。告知用户文件的绝对路径。
 
-For each candidate, render a card with:
+报告通过 CDN 加载 **Tailwind** 处理布局和样式，通过 CDN 加载 **Mermaid** 绘制适合用图、流程或时序表达的结构。混合使用 Mermaid 和手工 CSS/SVG 图示：调用图、依赖和时序等关系适合 Mermaid；体量对比、剖面和折叠效果等更强调表达方式的图示，使用手工 div/SVG。每个候选方案都要有**改进前后的对比图**。以图示为主。
 
-- **Files**: which files/modules are involved
-- **Problem**: why the current architecture is causing friction
-- **Solution**: plain English description of what would change
-- **Benefits**: explained in terms of locality and leverage, and how tests would improve
-- **Before / After diagram**: side-by-side, custom-drawn, illustrating the shallowness and the deepening
-- **Recommendation strength**: one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
+为每个候选方案生成一张卡片，包含：
 
-End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
+- **文件**：涉及哪些文件和模块。
+- **问题**：当前架构为什么阻碍理解、修改或测试。
+- **方案**：用简明中文说明会改变什么。
+- **收益**：用局部性和杠杆效应解释收益，并说明测试如何改善。
+- **改进前后对比图**：并排绘制，展示当前的浅模块及深化后的结构。
+- **推荐强度**：从 `Strong`（强烈推荐）、`Worth exploring`（值得探索）、`Speculative`（推测性建议）中选择一种，以徽章展示。
 
-**Use GLOSSARY.md vocabulary for the domain, and the `/codebase-design` vocabulary for the architecture.** If `GLOSSARY.md` defines "Order," talk about "the Order intake module," not "the FooBarHandler," and not "the Order service."
+报告最后给出**首选建议**：最先处理哪个候选方案，以及原因。
 
-**ADR conflicts**: if a candidate contradicts an existing ADR, only surface it when the friction is real enough to warrant revisiting the ADR. Mark it clearly in the card (e.g. a warning callout: _"contradicts ADR-0007, but worth reopening because…"_). Don't list every theoretical refactor an ADR forbids.
+**领域词汇来自 `GLOSSARY.md`，架构词汇来自 `codebase-design`。** 如果 `GLOSSARY.md` 定义了 `Order`，应称为「Order 接收模块」，而不是「FooBarHandler」或「Order 服务」。
 
-See [HTML-REPORT.md](HTML-REPORT.md) for the full HTML scaffold, diagram patterns, and styling guidance.
+**ADR 冲突**：如果候选方案与现有 ADR 冲突，只有实际阻碍足以支持重新讨论该 ADR 时才展示。必须在卡片中明确标注，例如警告提示：「与 ADR-0007 冲突，但值得重新讨论，因为……」。不要把 ADR 禁止的所有理论重构都列出来。
 
-Do NOT propose interfaces yet. After the file is written, ask the user: "Which of these would you like to explore?"
+完整 HTML 骨架、图示模式和样式指南见 [HTML-REPORT.md](HTML-REPORT.md)。
 
-### 3. Grilling loop
+此时**不要提出接口设计**。写完报告后，询问用户：「想进一步探索哪个候选方案？」等待用户选择。
 
-Once the user picks a candidate, call the Skill tool with "grilling" to walk the decision tree with them: constraints, dependencies, the shape of the deepened module, what sits behind the seam, what tests survive.
+### 3. 逐轮访谈
 
-Side effects happen inline as decisions crystallize; call the Skill tool with "domain-modeling" to keep the domain model current as you go:
+用户选择候选方案后，调用 Skill 工具，传入 `grilling`，逐项讨论决策树：约束、依赖、深化后模块的形态、接缝后面放什么，以及哪些测试保留。
 
-- **Naming a deepened module after a concept not in `GLOSSARY.md`?** Add the term to `GLOSSARY.md`. Create the file lazily if it doesn't exist.
-- **Sharpening a fuzzy term during the conversation?** Update `GLOSSARY.md` right there.
-- **User rejects the candidate with a load-bearing reason?** Offer an ADR, framed as: _"Want me to record this as an ADR so future architecture reviews don't re-suggest it?"_ Only offer when the reason would actually be needed by a future explorer to avoid re-suggesting the same thing; skip ephemeral reasons ("not worth it right now") and self-evident ones.
-- **Want to explore alternative interfaces for the deepened module?** Call the Skill tool with "codebase-design" and use its design-it-twice parallel sub-agent pattern.
+决策逐渐明确时，同步处理领域模型的变化。调用 Skill 工具，传入 `domain-modeling`，让领域模型保持最新：
+
+- **深化后的模块采用了 `GLOSSARY.md` 尚未收录的概念名称？** 将术语加入 `GLOSSARY.md`；文件不存在时，按需创建。
+- **对话中明确了一个原本含糊的术语？** 立即更新 `GLOSSARY.md`。
+- **用户因一个会影响后续决策的重要理由拒绝候选方案？** 可以提议记录 ADR：「要把这个决定记成 ADR，避免以后的架构审查再次提出同样的建议吗？」只有未来探索者确实需要这个理由才能避免重复建议时才提出。跳过临时理由，例如「现在不值得做」，也跳过不言自明的理由。
+- **需要探索深化后模块的不同接口方案？** 调用 Skill 工具，传入 `codebase-design`，使用其中的 design-it-twice 并行子代理模式。

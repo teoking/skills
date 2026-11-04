@@ -24,11 +24,12 @@ If you want to keep up with changes to these skills, and any new ones I create, 
 
 ## 中文入口
 
-本地中文试点已覆盖需求澄清、故障诊断和技能编写。默认用简体中文交互，英文技能标识、命令和路径保持稳定；其他技能仍保留上游内容。范围、安装来源说明、上游基线和验收用例见 [中文维护指南](./LOCALIZATION.md)。下方安装命令从 `git@github.com:teoking/skills.git` 的 `codingrock` 分支获取已推送的中文版本；`main` 与上游一致，未做中文优化。
+本地中文版本已覆盖需求澄清、故障诊断、技能编写和代码库架构改进。默认用简体中文交互，英文技能标识、命令和路径保持稳定；其他技能仍保留上游内容。范围、安装来源说明、上游基线和验收用例见 [中文维护指南](./LOCALIZATION.md)。下方安装命令从 `git@github.com:teoking/skills.git` 的 `codingrock` 分支获取已推送的中文版本；`main` 与上游一致，未做中文优化。
 
 ### User-invoked（仅用户主动调用）
 
 - [需求澄清入口 `grill-me`](./skills/productivity/grill-me/SKILL.md)：手动入口，内部依赖 `grilling`；入口本身暂未翻译，调用限制保持不变。
+- [代码库架构改进 `improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md)：手动扫描模块深化机会，生成中文 HTML 报告，选定候选方案后逐轮访谈；不直接执行重构。
 
 ### Model-invoked（模型或用户均可调用）
 
@@ -234,7 +235,7 @@ Skills I use daily for code work.
 - **[ask-matt](./skills/engineering/ask-matt/SKILL.md)**: Ask which skill or flow fits your situation. A router over the user-invoked skills in this repo.
 - **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)**: Grilling session that also builds your project's domain model, sharpening terminology and updating `GLOSSARY.md` and ADRs inline.
 - **[triage](./skills/engineering/triage/SKILL.md)**: Move issues through a state machine of triage roles.
-- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)**: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
+- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)**: 代码库架构改进：扫描模块深化机会，生成可视化 HTML 报告，再围绕用户选中的候选方案逐轮访谈。
 - **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)**: Configure this repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo before using the other engineering skills.
 - **[to-spec](./skills/engineering/to-spec/SKILL.md)**: Turn the current conversation into a spec and publish it to the issue tracker. No interview, just synthesizes what you've already discussed.
 - **[to-tickets](./skills/engineering/to-tickets/SKILL.md)**: Break any plan, spec, or conversation into a set of tracer-bullet tickets, each declaring its blocking edges, written as text in a local file, or as native blocking links on a real tracker.

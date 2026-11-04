@@ -1,13 +1,14 @@
 # 中文友好改造与维护
 
-本仓库按“小范围试点、逐步扩展”维护中文版本：中文作为试点技能的主要维护语言，英文标识保持稳定。其他技能暂时保留上游内容。
+本仓库按「小范围试点、逐步扩展」维护中文版本：中文作为已本地化技能的主要维护语言，英文标识保持稳定。其他技能暂时保留上游内容。
 
 ## 范围与来源
 
 - 上游：[mattpocock/skills](https://github.com/mattpocock/skills)。
-- 本次翻译基线：本地仓库提交 `03866313a2a4352408ab508e5925f828ae106b0d`，包版本 `1.3.1`。这是改造开始时的内容基线，不代表已检查上游最新版本。
-- 依据：用户提供的 session Markdown 中的三技能试点方案。
-- 日期：2026-10-27。
+- 初始三技能试点的翻译基线：本地仓库提交 `03866313a2a4352408ab508e5925f828ae106b0d`，包版本 `1.3.1`。这是改造开始时的内容基线，不代表已检查上游最新版本。
+- 初始依据：用户提供的 session Markdown 中的三技能试点方案。
+- 初始试点日期：2026-10-27。
+- `improve-codebase-architecture` 的翻译基线：本地仓库提交 `5f498f90cf12cc29567f866c346637c60c2dcf76`，包版本 `1.3.1`。本次按该提交的内容本地化，没有同步后续上游功能改动。
 - 保留原有 `LICENSE`、归属与发布清单。没有新增或改名技能，没有改变 promoted 集合。
 
 | 技能 | 中文范围 | 原有调用方式 |
@@ -15,14 +16,15 @@
 | [grilling](skills/productivity/grilling/SKILL.md) | 描述、正文、界面信息、说明页 | Model-invoked，模型或用户均可调用 |
 | [diagnosing-bugs](skills/engineering/diagnosing-bugs/SKILL.md) | 描述、正文、界面信息、说明页、HITL 模板注释和提示语 | Model-invoked，模型或用户均可调用 |
 | [writing-for-agents](skills/productivity/writing-for-agents/SKILL.md) | 描述、正文、`SKILL-MECHANICS.md`、界面信息、说明页 | Model-invoked，模型或用户均可调用 |
+| [improve-codebase-architecture](skills/engineering/improve-codebase-architecture/SKILL.md) | 描述、正文、`HTML-REPORT.md`、报告文案、界面信息、说明页 | User-invoked，仅用户主动调用 |
 
 ## 翻译、个人偏好与宿主适配
 
 翻译保留每一步的前置条件、完成条件、等待时机、文件引用与流程边界。关键术语首次出现附英文，便于对照。目录、`name`、配置字段、代码标识、命令和路径不翻译。
 
-本次个人偏好只有：试点技能默认用简体中文提问、解释和交付；用户指定其他语言时遵从用户，代码与技术标识遵循目标项目约定。这是新增的输出偏好，不是上游原文已有的要求。
+中文版本新增的输出偏好是：已本地化技能默认用简体中文提问、解释和交付，`improve-codebase-architecture` 的 HTML 报告也使用中文；用户指定其他语言时遵从用户，代码与技术标识遵循目标项目约定。这是新增的输出偏好，不是上游原文已有的要求。
 
-本次没有限制提问数量、改变诊断阶段、替换子代理、修改技能依赖调用方式，也没有改动 `grill-me` 的手动调用策略。`agents/openai.yaml` 的中文显示名称不创建中文命令别名。
+没有限制提问数量、改变诊断阶段、替换子代理、修改技能依赖调用方式，也没有改动 `grill-me` 的手动调用策略。`agents/openai.yaml` 的中文显示名称不创建中文命令别名。`improve-codebase-architecture` 保留 `disable-model-invocation: true` 和 `policy.allow_implicit_invocation: false`，不会因中文请求自动启动；报告中的推荐强度和依赖类别保留英文标识，架构术语首次出现附英文原词。
 
 ## 使用自己维护的版本
 
@@ -35,13 +37,14 @@
 ## 宿主能力边界
 
 - `grilling` 的环境事实调查仍要求子代理；没有该能力时，记录限制，另行设计适配，不能宣称完整流程已通过。
+- `improve-codebase-architecture` 的代码库探索仍要求子代理，依赖 `codebase-design`、`grilling` 和 `domain-modeling` 的 Skill 工具调用。默认报告仍通过 CDN 加载 Tailwind 和 Mermaid，浏览器需能访问这些资源；本次没有新增离线回退或自动重构。
 - `grill-me` 等包装入口仍使用上游的 `Skill` 工具调用约定。宿主没有同名工具时，需要单独处理依赖加载；本次可以直接选择试点技能验证其本身。
 - `diagnosing-bugs` 需要可执行的复现环境；HITL 模板还需要人工终端输入。普通对话中读到技能正文，不等于能运行测试或脚本。
 - 实际触发、显示名称和显式调用语法取决于宿主。这里不把仓库格式检查当作 pi、ChatGPT 的运行验收。
 
 ## 上游同步流程
 
-1. 从记录的基线到选定新提交查看差异，覆盖试点目录及对应说明页，先找流程和引用变化。
+1. 从记录的各技能基线到选定新提交查看差异，覆盖已本地化技能目录及对应说明页，先找流程和引用变化。
 2. 对照新旧正文逐项更新中文，重点核对前置条件、完成条件、调用限制和配套文件。
 3. 翻译与输出语言偏好、提问节奏、宿主适配分别维护；提交时分开记录，避免更新时混淆。
 4. 同步顶层和分桶索引、对应 `docs/<bucket>/<skill-name>.md`。如果用户入口或流程变化，重新检查 `ask-matt` 路由。
@@ -57,7 +60,10 @@
 | grilling | “挑战一下我的活动方案，通过提问找出遗漏。” | “只把这句话翻译成英文：帮我把需求问清楚。” | 选择 `grilling`；问题和推荐答案为中文，依赖问题留到下一轮，等待回答与最终确认 |
 | diagnosing-bugs | “导出功能升级后偶发失败，请排查根因并修复。”提供可运行的最小项目 | “只解释 TypeError 是什么，不要启动诊断。” | 选择 `diagnosing-bugs`；先运行能捕获症状的命令，脱敏输出，最小化后展示假设，修复后复跑原始场景 |
 | writing-for-agents | “帮我改进这个 AGENTS.md 的触发条件和完成标准。”提供草稿 | “帮我润色给客户看的活动邀请函。” | 选择 `writing-for-agents`；保留有效约束，按分支披露参考；写技能时读取 `SKILL-MECHANICS.md` |
+| improve-codebase-architecture | 不自动触发，需手动选择技能 | 「看看这个仓库有哪些架构问题。」不应绕过仅用户主动调用策略 | 选择 `improve-codebase-architecture`；先按方向或近期提交热点探索，再在临时目录生成中文 HTML 报告并告知绝对路径；等待选择后才调用 `grilling`，术语与 ADR 变化交给 `domain-modeling` |
 
 另测 `grill-me`：自然中文请求不应绕过其 `disable-model-invocation: true` 和 `allow_implicit_invocation: false`；手动选择后检查是否加载 `grilling`，不能凭包装入口名称推断依赖已执行。
 
-当前状态：已完成仓库静态检查和 HITL 模板的模拟输入冒烟检查；pi 与 ChatGPT 的实际发现、中文自动触发、多轮访谈及真实缺陷修复尚待分别运行验收。该表是可重复使用的验收清单，不是已通过的运行报告。
+另测 `improve-codebase-architecture`：用户指定英文时，报告和问题应遵从用户；默认中文报告的 `lang` 为 `zh-CN`。推荐强度标识保持 `Strong`、`Worth exploring`、`Speculative`；报告前不设计接口，探索与报告不修改业务代码。派子代理和加载依赖应在宿主执行记录中可见，不能仅凭报告内容推断已执行。
+
+当前状态：原三项试点已完成仓库静态检查和 HITL 模板的模拟输入冒烟检查；pi 与 ChatGPT 的实际发现、中文自动触发、多轮访谈及真实缺陷修复尚待分别运行验收。`improve-codebase-architecture` 本次仅完成仓库静态检查，宿主发现、子代理探索、浏览器报告渲染和多轮架构访谈尚未运行验收。该表是可重复使用的验收清单，不是已通过的运行报告。

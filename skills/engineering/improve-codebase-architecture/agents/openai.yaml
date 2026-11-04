@@ -1,5 +1,5 @@
 interface:
-  display_name: "Improve Codebase Architecture"
-  short_description: "Find and grill architecture improvements"
+  display_name: "代码库架构改进"
+  short_description: "扫描模块深化机会，生成可视化 HTML 报告，再围绕选中的方案逐轮访谈"
 policy:
   allow_implicit_invocation: false
