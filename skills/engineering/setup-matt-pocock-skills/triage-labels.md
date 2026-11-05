@@ -1,15 +1,15 @@
 # Triage Labels
 
-The skills speak in terms of five canonical triage roles. This file maps those roles to the actual label strings used in this repo's issue tracker.
+技能使用五种标准分诊角色。本文件将这些角色映射到本仓库工单跟踪器实际使用的标签字符串。
 
-| Label in mattpocock/skills | Label in our tracker | Meaning                                  |
+| Label in mattpocock/skills | Label in our tracker | Meaning |
 | -------------------------- | -------------------- | ---------------------------------------- |
-| `needs-triage`             | `needs-triage`       | Maintainer needs to evaluate this issue  |
-| `needs-info`               | `needs-info`         | Waiting on reporter for more information |
-| `ready-for-agent`          | `ready-for-agent`    | Fully specified, ready for an AFK agent  |
-| `ready-for-human`          | `ready-for-human`    | Requires human implementation            |
-| `wontfix`                  | `wontfix`            | Will not be actioned                     |
+| `needs-triage` | `needs-triage` | 维护者需要评估此工单 |
+| `needs-info` | `needs-info` | 等待报告者提供更多信息 |
+| `ready-for-agent` | `ready-for-agent` | 规格说明完整，可交给无人值守（AFK）的 agent |
+| `ready-for-human` | `ready-for-human` | 需要人工实现 |
+| `wontfix` | `wontfix` | 不会采取行动 |
 
-When a skill mentions a role (e.g. "apply the AFK-ready triage label"), use the corresponding label string from this table.
+当技能提到某种角色时（例如「添加可交给无人值守 agent 的分诊标签」），使用本表中对应的标签字符串。
 
-Edit the "Label in our tracker" column to match whatever vocabulary you actually use.
+编辑「Label in our tracker」列，使其与实际使用的词汇一致。

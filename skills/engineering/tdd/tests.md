@@ -1,11 +1,11 @@
-# Good and Bad Tests
+# 好测试与差测试
 
-## Good Tests
+## 好测试
 
-**Integration-style**: Test through real interfaces, not mocks of internal parts.
+**集成式测试**：通过真实接口测试，而非 mock 内部组件。
 
 ```typescript
-// GOOD: Tests observable behavior
+// 好：测试可观察的行为
 test("user can checkout with valid cart", async () => {
   const cart = createCart();
   cart.add(product);
@@ -14,20 +14,20 @@ test("user can checkout with valid cart", async () => {
 });
 ```
 
-Characteristics:
+特点：
 
-- Tests behavior users/callers care about
-- Uses public API only
-- Survives internal refactors
-- Describes WHAT, not HOW
-- One logical assertion per test
+- 测试用户／调用方关心的行为
+- 只使用公开 API
+- 能够经受内部重构
+- 描述做了什么，而非如何做到
+- 每个测试包含一个逻辑断言
 
-## Bad Tests
+## 差测试
 
-**Implementation-detail tests**: Coupled to internal structure.
+**测试实现细节**：与内部结构耦合。
 
 ```typescript
-// BAD: Tests implementation details
+// 差：测试实现细节
 test("checkout calls paymentService.process", async () => {
   const mockPayment = jest.mock(paymentService);
   await checkout(cart, payment);
@@ -35,24 +35,24 @@ test("checkout calls paymentService.process", async () => {
 });
 ```
 
-Red flags:
+警示信号：
 
-- Mocking internal collaborators
-- Testing private methods
-- Asserting on call counts/order
-- Test breaks when refactoring without behavior change
-- Test name describes HOW not WHAT
-- Verifying through external means instead of interface
+- mock 内部协作者
+- 测试私有方法
+- 对调用次数／顺序作断言
+- 重构未改变行为，测试却失败
+- 测试名称描述如何做到，而非做了什么
+- 通过接口之外的手段验证，而非使用接口
 
 ```typescript
-// BAD: Bypasses interface to verify
+// 差：绕过接口验证
 test("createUser saves to database", async () => {
   await createUser({ name: "Alice" });
   const row = await db.query("SELECT * FROM users WHERE name = ?", ["Alice"]);
   expect(row).toBeDefined();
 });
 
-// GOOD: Verifies through interface
+// 好：通过接口验证
 test("createUser makes user retrievable", async () => {
   const user = await createUser({ name: "Alice" });
   const retrieved = await getUser(user.id);
@@ -60,17 +60,17 @@ test("createUser makes user retrievable", async () => {
 });
 ```
 
-**Tautological tests**: Expected value restates the implementation, so the test passes by construction.
+**同义反复的测试**：期望值重复了实现逻辑，因此测试在构造上必然通过。
 
 ```typescript
-// BAD: Expected value is recomputed the way the code computes it
+// 差：以与代码相同的方式重新计算期望值
 test("calculateTotal sums line items", () => {
   const items = [{ price: 10 }, { price: 5 }];
   const expected = items.reduce((sum, i) => sum + i.price, 0);
   expect(calculateTotal(items)).toBe(expected);
 });
 
-// GOOD: Expected value is an independent, known literal
+// 好：期望值是独立的、已知正确的字面量
 test("calculateTotal sums line items", () => {
   expect(calculateTotal([{ price: 10 }, { price: 5 }])).toBe(15);
 });

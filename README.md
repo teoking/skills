@@ -24,20 +24,45 @@ If you want to keep up with changes to these skills, and any new ones I create, 
 
 ## 中文入口
 
-本地中文版本已覆盖需求澄清、故障诊断、技能编写和代码库架构改进。默认用简体中文交互，英文技能标识、命令和路径保持稳定；其他技能仍保留上游内容。范围、安装来源说明、上游基线和验收用例见 [中文维护指南](./LOCALIZATION.md)。下方安装命令从 `git@github.com:teoking/skills.git` 的 `codingrock` 分支获取已推送的中文版本；`main` 与上游一致，未做中文优化。
+本地中文维护范围已覆盖「想法到交付」主流程、首次配置及共享参考，并保留此前的故障诊断和代码库架构改进。默认用简体中文交互，英文技能标识、命令、路径和调用策略保持稳定；未列入中文范围的技能仍保留上游正文。范围、安装来源、翻译基线和验收清单见[中文维护指南](./LOCALIZATION.md)。下方安装命令只获取 `git@github.com:teoking/skills.git` 的 `codingrock` 分支中已推送的提交，不包含本地未提交或未推送的修改；`main` 与上游一致，未做中文优化。
+
+主流程从需求访谈开始，按问题和构建规模选择分支：
+
+- 需要可运行答案：用 `handoff` 转到独立会话制作 `prototype`，再将结论交接回来。
+- 跨会话构建：`grill-with-docs` → `to-spec` → `to-tickets` → 逐工单 `implement` 或整份规格说明 `implement-spec` → `retro`。
+- 当前会话即可完成：`grill-with-docs` → `implement` → `retro`。
+
+实现阶段使用 `tdd` 和 `code-review`；写 PR 时使用 `pr`。技能之间的调用仍遵循原有策略，中文化不增加自动执行能力。
 
 ### User-invoked（仅用户主动调用）
 
-- [需求澄清入口 `grill-me`](./skills/productivity/grill-me/SKILL.md)：手动入口，内部依赖 `grilling`；入口本身暂未翻译，调用限制保持不变。
-- [代码库架构改进 `improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md)：手动扫描模块深化机会，生成中文 HTML 报告，选定候选方案后逐轮访谈；不直接执行重构。
+| 中文名称 | 技能标识 | 用途 |
+| --- | --- | --- |
+| 流程导航 | [ask-matt](./skills/engineering/ask-matt/SKILL.md) | 根据当前情况推荐下一步，不代为启动工作 |
+| 首次配置 | [setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md) | 配置工单跟踪器、分诊标签和领域文档布局 |
+| 需求访谈与文档 | [grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md) | 在工作目录中澄清想法，及时维护术语表和 ADR |
+| 无状态需求访谈 | [grill-me](./skills/productivity/grill-me/SKILL.md) | 无工作目录时使用的访谈入口，不保存本地文档 |
+| 上下文交接 | [handoff](./skills/productivity/handoff/SKILL.md) | 将可携带的交接文档写入系统临时目录 |
+| 规格说明 | [to-spec](./skills/engineering/to-spec/SKILL.md) | 综合已有讨论，不重新访谈；确认测试接缝后发布 |
+| 工单拆分 | [to-tickets](./skills/engineering/to-tickets/SKILL.md) | 拆成曳光弹工单，明确阻塞关系并等待用户批准 |
+| 单项实现 | [implement](./skills/engineering/implement/SKILL.md) | 按规格说明或工单实现，审查后提交当前分支 |
+| 整体实现 | [implement-spec](./skills/engineering/implement-spec/SKILL.md) | 按任务图调度子代理，将整份规格说明实现到集成分支 |
+| 会话复盘 | [retro](./skills/engineering/retro/SKILL.md) | 回顾会话并提出环境改进建议，等待用户选择候选项 |
+| 代码库架构改进 | [improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md) | 扫描深化机会，先生成中文 HTML 报告，再围绕所选候选方案访谈 |
 
 ### Model-invoked（模型或用户均可调用）
 
 | 中文名称 | 技能标识 | 可以这样说 |
 | --- | --- | --- |
 | 需求澄清 | [grilling](./skills/productivity/grilling/SKILL.md) | 帮我把需求问清楚，挑战一下方案中的假设 |
-| 故障诊断 | [diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md) | 帮我排查这个偶发 bug，并验证修复 |
+| 领域建模 | [domain-modeling](./skills/engineering/domain-modeling/SKILL.md) | 检查这些术语是否混用了不同概念，并记录已明确的定义 |
+| 原型探索 | [prototype](./skills/engineering/prototype/SKILL.md) | 做一个一次性原型，验证这个状态模型是否合理 |
+| 测试驱动开发 | [tdd](./skills/engineering/tdd/SKILL.md) | 在约定接缝上先写失败测试，再逐个纵向切片实现 |
+| 深模块设计 | [codebase-design](./skills/engineering/codebase-design/SKILL.md) | 帮我评估模块接口和接缝，让复杂行为集中在小接口之后 |
+| 代码审查 | [code-review](./skills/engineering/code-review/SKILL.md) | 从指定提交起，分别审查代码标准和规格说明符合程度 |
+| PR 正文 | [pr](./skills/engineering/pr/SKILL.md) | 写 PR 说明，展示变更、前后证据和合并风险 |
 | 技能与指令编写 | [writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md) | 帮我改进这个技能的触发条件和完成标准 |
+| 故障诊断 | [diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md) | 帮我排查这个偶发 bug，并验证修复 |
 
 中文显示名称不创建中文命令别名；显式调用方式由宿主决定。
 
@@ -114,11 +139,11 @@ When the installer asks which skills to take, include `setup-matt-pocock-skills`
 
 ### 2. Run `/setup-matt-pocock-skills`
 
-In your agent, run it once per repo. It will:
+在每个仓库首次使用工程流程前，由用户主动运行一次。它先探索现有配置，再确认并写入：
 
-- Ask you which issue tracker you want to use (GitHub, GitLab, local files, or anything else you describe)
-- Ask you what labels you apply to tickets when you triage them (`/triage` uses labels)
-- Ask you where you want to save any docs we create
+- 工单跟踪器：优先推荐远端对应的 GitHub 或 GitLab，也支持本地文件和用户描述的其他工作方式。
+- 分诊标签：仅在安装了 `triage` 时询问是否保留默认标签，再按需要记录替代名称。
+- 领域文档布局：默认写入单上下文布局；只有发现 monorepo 特征时才询问是否采用多上下文布局。
 
 ### 3. Bam - you're ready to go.
 
@@ -138,8 +163,8 @@ This is just the same in the AI age. There is a communication gap between you an
 
 **The Fix** is to use:
 
-- [`/grill-me`](./skills/productivity/grill-me/SKILL.md) - for non-code uses
-- [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md) - same as [`/grill-me`](./skills/productivity/grill-me/SKILL.md), but adds more goodies (see below)
+- [`/grill-me`](./skills/productivity/grill-me/SKILL.md)：没有工作目录时使用，不保存本地文档。
+- [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md)：在工作目录中使用，同样开展访谈，并及时维护领域术语和 ADR。
 
 These are my most popular skills. They help you align with the agent before you get started, and think deeply about the change you're making. Use them _every_ time you want to make a change.
 
@@ -192,7 +217,7 @@ It's time to look at your feedback loops. Without feedback on how the code it pr
 
 **The Fix**: You need the usual tranche of feedback loops: static types, browser access, and automated tests.
 
-For automated tests, a red-green-refactor loop is critical. This is where the agent writes a failing test first, then fixes the test. This helps give the agent a consistent level of feedback that results in far better code.
+自动测试使用红灯 → 绿灯循环：agent 先写失败测试，再编写使测试通过的最少代码，逐个纵向切片获得反馈。`tdd` 将重构留到审查阶段，不把它作为红灯 → 绿灯实现循环的一部分。
 
 I've built a **[`/tdd`](./skills/engineering/tdd/SKILL.md) skill** you can slot into any project. It encourages red-green-refactor and gives the agent plenty of guidance on what makes good and bad tests.
 
@@ -214,7 +239,7 @@ For debugging, I've also built a **[`/diagnosing-bugs`](./skills/engineering/dia
 
 This is built in to every layer of these skills:
 
-- [`/to-spec`](./skills/engineering/to-spec/SKILL.md) quizzes you about which modules you're touching before creating a spec
+- [`/to-spec`](./skills/engineering/to-spec/SKILL.md) 综合已有讨论，不重新访谈；生成规格说明前与用户确认测试接缝。
 
 And crucially, [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) surveys a codebase for deepening opportunities and hands you the candidates. I recommend running it on your codebase once every few days. It is a survey, not a rescue: on a genuinely old codebase it will find real candidates, but it won't untangle the mud for you.
 
@@ -232,28 +257,28 @@ Skills I use daily for code work.
 
 **User-invoked**
 
-- **[ask-matt](./skills/engineering/ask-matt/SKILL.md)**: Ask which skill or flow fits your situation. A router over the user-invoked skills in this repo.
-- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)**: Grilling session that also builds your project's domain model, sharpening terminology and updating `GLOSSARY.md` and ADRs inline.
+- **[ask-matt](./skills/engineering/ask-matt/SKILL.md)**：流程导航：根据当前情况推荐本仓库中的技能或流程，不代为启动工作。
+- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)**：需求访谈与文档：逐轮澄清想法，同时明确领域术语并及时更新 `GLOSSARY.md` 和 ADR。
 - **[triage](./skills/engineering/triage/SKILL.md)**: Move issues through a state machine of triage roles.
 - **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)**: 代码库架构改进：扫描模块深化机会，生成可视化 HTML 报告，再围绕用户选中的候选方案逐轮访谈。
-- **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)**: Configure this repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo before using the other engineering skills.
-- **[to-spec](./skills/engineering/to-spec/SKILL.md)**: Turn the current conversation into a spec and publish it to the issue tracker. No interview, just synthesizes what you've already discussed.
-- **[to-tickets](./skills/engineering/to-tickets/SKILL.md)**: Break any plan, spec, or conversation into a set of tracer-bullet tickets, each declaring its blocking edges, written as text in a local file, or as native blocking links on a real tracker.
-- **[implement](./skills/engineering/implement/SKILL.md)**: Build the work described by a spec or set of tickets, driving `/tdd` at pre-agreed seams and closing out with `/code-review` before committing.
-- **[implement-spec](./skills/engineering/implement-spec/SKILL.md)**: Implement a whole spec on one integration branch. Works the tickets as a task graph, running implementer subagents across the ready frontier for maximum concurrency, then closes out with `/code-review`.
+- **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)**：首次配置：为当前仓库配置工单跟踪器、分诊标签和领域文档布局，首次使用工程流程前运行。
+- **[to-spec](./skills/engineering/to-spec/SKILL.md)**：规格说明：综合已有讨论，不重新访谈；确认测试接缝后生成规格说明并发布到工单跟踪器。
+- **[to-tickets](./skills/engineering/to-tickets/SKILL.md)**：工单拆分：将计划、规格说明或讨论拆成曳光弹工单，明确阻塞关系；本地每单一文件，在线优先使用原生阻塞链接。
+- **[implement](./skills/engineering/implement/SKILL.md)**：单项实现：按规格说明或工单实现，尽可能在预先约定的接缝上使用 `tdd`，经 `code-review` 审查后提交当前分支。
+- **[implement-spec](./skills/engineering/implement-spec/SKILL.md)**：整体实现：把工单作为任务图，跨可执行前沿并行调度实现子代理，将整份规格说明汇入集成分支后统一审查。
 - **[wayfinder](./skills/engineering/wayfinder/SKILL.md)**: Plan a huge chunk of work, more than one agent session can hold, as a shared map of decision tickets on the issue tracker, and resolve them one at a time until the way to the destination is clear.
-- **[retro](./skills/engineering/retro/SKILL.md)**: Suggest improvements to the coding agent's environment (navigation, automated checks, coding standards, steering files, tooling) after a session, most severe first.
+- **[retro](./skills/engineering/retro/SKILL.md)**：会话复盘：按严重程度提出 agent 环境改进，包括导航、自动检查、代码标准、引导文件和工具。
 
 **Model-invoked**
 
-- **[prototype](./skills/engineering/prototype/SKILL.md)**: Build a throwaway prototype to answer a design question, either a single shareable HTML file for state/logic questions, or several radically different UI variations toggleable from one route.
+- **[prototype](./skills/engineering/prototype/SKILL.md)**：原型探索：用一次性代码回答设计问题；逻辑分支生成可分享的单个 HTML 文件，UI 分支在同一路由切换多种明显不同的方案。
 - **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: 故障诊断：建立能捕获具体缺陷的反馈循环，依次最小化、验证假设、增加观测、修复并回归检查。
 - **[research](./skills/engineering/research/SKILL.md)**: Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, run as a background agent.
-- **[tdd](./skills/engineering/tdd/SKILL.md)**: Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
-- **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)**: Actively build and sharpen a project's domain model: challenge terms against the glossary, stress-test with edge-case scenarios, and update `GLOSSARY.md` and ADRs inline.
-- **[codebase-design](./skills/engineering/codebase-design/SKILL.md)**: Shared discipline and vocabulary for designing deep modules: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface.
-- **[code-review](./skills/engineering/code-review/SKILL.md)**: Two-axis review of the diff since a fixed point: **Standards** (does it follow the repo's coding standards, plus a Fowler smell baseline?) and **Spec** (does it faithfully implement the originating issue/spec?), run as parallel sub-agents so neither pollutes the other.
-- **[pr](./skills/engineering/pr/SKILL.md)**: The shape a pull request body should take: a summary as the smallest visual that makes the change clear, before/after evidence that it works, and a merge-danger call (one-way or two-way door, plus blast radius).
+- **[tdd](./skills/engineering/tdd/SKILL.md)**：测试驱动开发：在约定接缝上逐个纵向切片运行红灯 → 绿灯循环，重构留到审查阶段。
+- **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)**：领域建模：对照术语表质疑含混定义，用边界场景检验关系，并及时维护 `GLOSSARY.md` 和符合条件的 ADR。
+- **[codebase-design](./skills/engineering/codebase-design/SKILL.md)**：深模块设计：共享模块、接口、深度和接缝等词汇，使复杂行为集中在小接口之后，并通过该接口测试。
+- **[code-review](./skills/engineering/code-review/SKILL.md)**：代码审查：从固定基点分别审查 **Standards（代码标准）** 与 **Spec（规格说明）**，由相互独立的并行子代理执行。
+- **[pr](./skills/engineering/pr/SKILL.md)**：PR 正文：用最小可视化说明变更，提供前后验证证据，并判断合并是单向门还是双向门及其影响范围。
 - **[wizard](./skills/engineering/wizard/SKILL.md)**: Generate an interactive bash wizard that walks a human through steps only they can perform: provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover.
 
 ### Productivity
@@ -262,8 +287,8 @@ General workflow tools, not code-specific.
 
 **User-invoked**
 
-- **[grill-me](./skills/productivity/grill-me/SKILL.md)**: Get relentlessly interviewed about a plan or design until every branch of the design tree is resolved.
-- **[handoff](./skills/productivity/handoff/SKILL.md)**: Compact the current conversation into a handoff document so another agent can continue the work.
+- **[grill-me](./skills/productivity/grill-me/SKILL.md)**：无状态需求访谈：围绕计划或设计持续提问，直到设计树的所有分支都明确。
+- **[handoff](./skills/productivity/handoff/SKILL.md)**：上下文交接：综合当前讨论，将脱敏后的交接文档写入系统临时目录，供新 agent 接续工作。
 - **[teach](./skills/productivity/teach/SKILL.md)**: Teach the user a new skill or concept over multiple sessions, using the current directory as a stateful teaching workspace.
 - **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)**: Turn a decision you can't answer alone into a Markdown questionnaire for the one person who can, filled in async, or together over a meeting. It grills you about the send (who it's for, what you need back), not the subject.
 - **[wait-what](./skills/productivity/wait-what/SKILL.md)**: Fire this the moment a message doesn't land. The agent re-pitches it with the context you're missing, in plain English, using your `GLOSSARY.md` vocabulary.

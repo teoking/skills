@@ -1,82 +1,89 @@
 ## What it does
 
-`grill-with-docs` interviews you about a plan or design until you and the [agent](https://www.aihero.dev/ai-coding-dictionary/agent) share one understanding of it, and writes the vocabulary and the hard decisions into your repo while it does. It is the same interview [grill-me](https://aihero.dev/skills-grill-me) runs (a round of questions, then wait, then the next round), pointed at a codebase.
+`grill-with-docs` 围绕计划或设计进行访谈，直到使用者与 [agent](https://www.aihero.dev/ai-coding-dictionary/agent) 达成共同理解，并在过程中把术语和重大决策写入仓库。它与 [grill-me](https://aihero.dev/skills-grill-me) 使用相同的访谈方式（提问一轮，等待回答，再进入下一轮），但面向代码库。
 
-It is **[stateful](https://www.aihero.dev/ai-coding-dictionary/stateful)**. Every other grilling skill leaves the [session](https://www.aihero.dev/ai-coding-dictionary/session) in your head; this one leaves files on disk. When a term resolves, the skill writes it to `GLOSSARY.md` at once, not in a batch at the end. When a decision passes three gates, the skill writes it as an ADR. That is the whole difference, and it also causes most of the trouble people have with the skill. The artifacts are real files in a real repo, so they can be missing when you expected them, and they can drift when more than one person writes them.
+它是**[有状态的（stateful）](https://www.aihero.dev/ai-coding-dictionary/stateful)**。其他 grilling 技能把[会话（session）](https://www.aihero.dev/ai-coding-dictionary/session)的结果留在脑中；这个技能会在磁盘上留下文件。术语一旦确定，就立即写入 `GLOSSARY.md`，而不是等到最后集中处理。决策通过三项条件后，会写成架构决策记录（ADR）。这就是全部区别，也是使用者遇到的大多数问题的起因。产物是真实仓库中的真实文件，因此预期的文件可能没有出现，多人编写时内容也可能发生偏移。
 
 ## When to reach for it
 
-You invoke this by typing `/grill-with-docs`, and the agent won't reach for it on its own.
+输入 `/grill-with-docs` 主动调用，agent 不会自行启动它。
 
-Reach for it at the start of a change, in a repo, when the plan is still fuzzy and the words for the thing are not settled yet. It is the single-session tool. Which grilling skill you want depends on what is in front of you:
+在仓库中开始一项变更时，如果计划仍不清晰、相关用词尚未确定，就使用它。它适合在一次会话中完成规划。选择哪一个 grilling 技能，取决于眼前的情况：
 
-| What you have | Reach for |
+| 当前情况 | 使用的技能 |
 | --- | --- |
-| You aren't working in a working directory at all | [grill-me](https://aihero.dev/skills-grill-me) |
-| A repo, and a change you can settle in one session | `grill-with-docs` |
-| An effort too big to hold in one session (a greenfield build, a large feature) | [wayfinder](https://aihero.dev/skills-wayfinder) |
-| A repo with no domain docs at all, and no particular feature in mind | `grill-with-docs`, aimed at the repo rather than a change |
-| A decision blocked on knowledge in someone else's head | [to-questionnaire](https://aihero.dev/skills-to-questionnaire) |
+| 完全不在工作目录中开展工作 | [grill-me](https://aihero.dev/skills-grill-me) |
+| 有仓库，且能在一次会话中确定这项变更 | `grill-with-docs` |
+| 工作规模太大，一次会话容纳不下（全新构建、大型功能） | [wayfinder](https://aihero.dev/skills-wayfinder) |
+| 仓库完全没有领域文档，也没有要讨论的特定功能 | `grill-with-docs`，把目标指向仓库而不是某项变更 |
+| 某项决策被他人掌握的知识阻塞 | [to-questionnaire](https://aihero.dev/skills-to-questionnaire) |
 
-The wayfinder split comes down to session count: `/grill-with-docs` for single-session planning, `/wayfinder` for multi-session planning.
+与 wayfinder 的分界取决于会话数量：`/grill-with-docs` 用于单次会话规划，`/wayfinder` 用于跨多次会话的规划。
 
 ## Prerequisites
 
-The skill writes into your repo, so you need to be somewhere it is safe to write. Resolved terms go to a `GLOSSARY.md` glossary at the root, or to the relevant context's `GLOSSARY.md`, if a `GLOSSARY-MAP.md` at the root marks the repo as multi-context. Decisions go to `docs/adr/`. The skill creates both only when it needs them. Nothing exists until the first term or decision is settled, so you set up nothing in advance.
+技能会写入仓库，因此需要处于可以安全写入的位置。确定的术语进入根目录的术语表 `GLOSSARY.md`；如果根目录的 `GLOSSARY-MAP.md` 表明仓库采用多上下文（multi-context）结构，则写入对应上下文的 `GLOSSARY.md`。决策写入 `docs/adr/`。只有需要时，技能才会创建这些文件或目录。第一个术语或决策确定之前，不会产生文件，因此无需提前准备它们。
 
-It also needs two other skills present, because its own `SKILL.md` is one line that delegates to them. [grilling](https://aihero.dev/skills-grilling) supplies the interview, and [domain-modeling](https://aihero.dev/skills-domain-modeling) supplies the writing. Installing `grill-with-docs` alone gets you a skill that does not work.
+还需要具备另外两个技能，因为 `SKILL.md` 中的业务指令只有一行，委托它们完成工作。[grilling](https://aihero.dev/skills-grilling) 提供访谈，[domain-modeling](https://aihero.dev/skills-domain-modeling) 提供文档编写。只安装 `grill-with-docs`，技能无法正常工作。
 
-## The paper trail
+## 留下的记录
 
-Three things come out of a session, and they are not equal.
+一次会话会产生三类结果，但它们并不等价。
 
-| What resolved | Where it lands |
+| 已确定的内容 | 记录位置 |
 | --- | --- |
-| A term: the project's own word for a thing | `GLOSSARY.md`, inline, the moment it resolves |
-| A decision that is hard to reverse, surprising without context, and a real trade-off | An ADR under `docs/adr/` |
-| Everything else you decided | The conversation, and nowhere else |
+| 术语：项目对某个事物的专用词 | `GLOSSARY.md`，术语确定时即时写入 |
+| 难以撤销、缺少背景就令人费解、且确实权衡过不同方案的决策 | `docs/adr/` 下的 ADR |
+| 其他所有决定 | 只留在对话中 |
 
-That third row is the one that catches people out. `GLOSSARY.md` is only a glossary. It holds no implementation details, no [spec](https://www.aihero.dev/ai-coding-dictionary/spec), and no scratch notes. An ADR needs all three conditions at once, so most decisions do not qualify and most sessions produce none. A session that yields a sharper glossary and zero ADRs is working as designed, but it means most of what you agreed exists only in the [context window](https://www.aihero.dev/ai-coding-dictionary/context-window) you agreed it in. Hand that same conversation to [to-spec](https://aihero.dev/skills-to-spec) rather than [clearing](https://www.aihero.dev/ai-coding-dictionary/clearing) it.
+第三行最容易出乎意料。`GLOSSARY.md` 只是术语表，不包含实现细节、[规格说明（spec）](https://www.aihero.dev/ai-coding-dictionary/spec)或草稿笔记。ADR 必须同时满足三项条件，因此大多数决策不符合要求，大多数会话不会产生 ADR。术语表变得更准确而 ADR 数量为零，符合技能的设计；但这也意味着，大多数共识只存在于当时的[上下文窗口（context window）](https://www.aihero.dev/ai-coding-dictionary/context-window)中。把同一段对话交给 [to-spec](https://aihero.dev/skills-to-spec)，不要直接[清空（clearing）](https://www.aihero.dev/ai-coding-dictionary/clearing)它。
 
-The glossary is the main output. This skill builds domain language: the project's own words, agreed once, so you, the agent and your colleagues do not have to work them out again. Not everyone agrees that this improves agent performance. The strongest objection is that a term and its plain-English expansion get the same result from the [model](https://www.aihero.dev/ai-coding-dictionary/model), and that the vocabulary mainly shortens communication between the humans who share it. On that view the glossary is still valuable, but the value goes to the humans.
+术语表是主要产物。技能构建领域语言：把项目专用词一次确定下来，使用者、agent 和同事就不必反复讨论同一套用词。并非所有人都认同这能改善 agent 的表现。最有力的反对意见是：术语和它的普通英文释义会让[模型（model）](https://www.aihero.dev/ai-coding-dictionary/model)产生相同结果，词汇主要缩短了掌握它的人之间的沟通。在这种观点下，术语表仍有价值，但价值主要属于人。
 
 ## Common questions
 
-**Should I use this or `/wayfinder`?**
-Scope decides it. Use this for anything you can settle in one session; use [wayfinder](https://aihero.dev/skills-wayfinder) when the effort is too big to hold in one, and it charts the work as a map of decision [tickets](https://www.aihero.dev/ai-coding-dictionary/ticket) first. Wayfinder is slower and denser, and reaching for it on a well-scoped feature is the common mistake. It does not replace this skill, and it can start a grilling session for the parts of the map that suit one.
+**应该用这个技能，还是 `/wayfinder`？**
 
-**It ran, but no `GLOSSARY.md` and no ADRs appeared.**
-There are two known causes. The first is that nothing qualified. ADRs need all three gates, and a session about a change with no new vocabulary has nothing to write. The second is a real bug. When the skill runs inside another orchestration layer (a spec-driven-development wrapper, a multi-agent framework, a rule that invokes it as a step in someone else's pipeline), users report that the file-writing half silently does not happen, while the interview still runs. The bug is filed and unfixed. If you are in that setup, check the working directory before you trust the session's output.
+由范围决定。能在一次会话中确定的工作使用本技能；规模太大、一次会话容纳不下时，使用 [wayfinder](https://aihero.dev/skills-wayfinder)，它会先把工作组织为决策[工单（ticket）](https://www.aihero.dev/ai-coding-dictionary/ticket)地图。Wayfinder 更慢、内容更密集，对范围明确的功能使用它是常见误区。它不取代本技能，而且可以针对地图中适合的部分启动 grilling 会话。
 
-**It asked everything at once, with no recommendations, and never mentioned `GLOSSARY.md`.**
-That is the skill failing to load its two dependencies. Because `SKILL.md` is a one-line delegation, an agent that does not pick up [grilling](https://aihero.dev/skills-grilling) and [domain-modeling](https://aihero.dev/skills-domain-modeling) guesses at what grilling means, and you get every question at once with no structure. Partial loading is more confusing. `grilling` loads, `domain-modeling` does not, and you get a good interview with no paper trail. How often it happens depends on the model and the [effort](https://www.aihero.dev/ai-coding-dictionary/effort) level, and it is the most reported problem with this skill. If you suspect it, ask the agent directly which skills it loaded.
+**技能运行了，但没有出现 `GLOSSARY.md` 或 ADR。**
 
-**Where did all my other decisions go?**
-Into the conversation only. This is the most serious open complaint about the skill. The glossary is not a spec, most answers do not earn an ADR, and no record links each resolved answer to a spec, a ticket and a test. Later steps soften precise answers (ordering guarantees, negative requirements, numeric defaults) into weaker prose, and the result can look complete while missing the thing you decided. For now, keep the session and feed it straight to [to-spec](https://aihero.dev/skills-to-spec). Then re-read the spec against your own answers rather than assuming it captured them.
+有两个已知原因。第一，没有内容符合写入条件。ADR 需要同时满足三项条件；如果讨论的变更没有新术语，就没有术语要写。第二，确实存在缺陷。用户报告，当技能在另一层编排机制内运行时（规格驱动开发包装层、多 agent 框架，或将它作为其他流水线步骤调用的规则），访谈仍会进行，但文件编写部分会悄悄缺失。该缺陷已登记，尚未修复。如果处于这种环境，信任会话产物之前先检查工作目录。
 
-**Can I point it at an existing repo that has no docs at all?**
-Yes. This is the right skill for a codebase with no ADRs, no domain language and no design principles: invoke it and say "help me document my repo". Users often pair it with [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture) for building or repairing a `GLOSSARY.md`. Expect to steer it. It reads code and asks you about what it finds, and you decide which of the words already in the codebase are the right ones.
+**它一次问完所有问题，没有推荐答案，也从未提到 `GLOSSARY.md`。**
 
-**What should I do when the session ends?**
-The skill's closing message is often open-ended, which is a known problem. In the main flow the answer is [to-spec](https://aihero.dev/skills-to-spec), in the same conversation. If the change is small enough to build immediately, go straight to [implement](https://aihero.dev/skills-implement) instead.
+这是两个依赖技能未能加载的表现。由于 `SKILL.md` 的业务指令是一行委托调用，如果 agent 没有加载 [grilling](https://aihero.dev/skills-grilling) 和 [domain-modeling](https://aihero.dev/skills-domain-modeling)，就会自行猜测 grilling 的含义，结果是把所有问题一次抛出，毫无结构。部分加载更令人困惑：`grilling` 已加载，`domain-modeling` 未加载，于是访谈进行得不错，却没有留下文档。发生频率取决于模型和[推理投入（effort）](https://www.aihero.dev/ai-coding-dictionary/effort)级别；这是本技能被报告最多的问题。怀疑出现这种情况时，直接询问 agent 加载了哪些技能。
 
-**Why is it called that?**
-Nobody is happy with the name. There is an open suggestion to rename it `grill-domain-model`, which describes the behaviour more accurately. Nothing has moved on it. If a rename ever lands, the docs page moves with it and the URL changes.
+**其他决策都去了哪里？**
+
+只在对话中。这是本技能尚未解决的最严重反馈。术语表不是规格说明，大多数回答不够资格成为 ADR，也没有记录把每个确定的回答关联到规格说明、工单和测试。后续步骤会把准确回答（顺序保证、明确不做什么的要求、数值默认值）弱化成不那么严格的文字；结果看似完整，却漏掉了已经确定的内容。目前，应保留会话并直接交给 [to-spec](https://aihero.dev/skills-to-spec)。然后对照自己的回答重读规格说明，不要假定它已完整记录。
+
+**能用于完全没有文档的现有仓库吗？**
+
+可以。对于没有 ADR、没有领域语言、没有设计原则的代码库，这就是合适的技能：主动调用，并说「帮我为仓库编写文档」。使用者经常将它与 [improve-codebase-architecture](https://aihero.dev/skills-improve-codebase-architecture) 搭配，用于建立或修正 `GLOSSARY.md`。需要主动引导。它读取代码，根据发现提问，再由使用者决定代码库中已有的哪些用词是正确的。
+
+**会话结束后应该做什么？**
+
+技能的结束语经常没有明确后续方向，这是已知问题。主流程中的下一步是在同一段对话里使用 [to-spec](https://aihero.dev/skills-to-spec)。如果变更足够小，可以立即实现，则直接使用 [implement](https://aihero.dev/skills-implement)。
+
+**为什么叫这个名字？**
+
+这个名字并不令人满意。已有尚未解决的建议，希望将其改名为 `grill-domain-model`，以便更准确地描述行为。目前没有进展。如果以后真的改名，docs 页也会迁移，URL 随之改变。
 
 ## It's working if
 
-- `GLOSSARY.md` changes *during* the session, term by term, rather than appearing in one lump at the end.
-- The glossary reads as pure vocabulary (your project's words with tight definitions) and contains no implementation detail or spec-like prose.
-- Questions the codebase can answer get answered by reading the codebase, not asked of you.
-- You get few or no ADRs, and the ones you get are decisions you would be annoyed to have to argue again.
-- It challenges a word you used because your existing glossary defines it differently.
+- `GLOSSARY.md` 在会话*过程中*逐个术语地变化，而不是最后一次性出现。
+- 术语表只包含词汇（项目专用词及其紧凑定义），没有实现细节或类似规格说明的文字。
+- 代码库能够回答的问题，通过读取代码库得到答案，而不是拿来询问使用者。
+- ADR 很少或没有；产生的 ADR 记录了那些不愿再次争论的决策。
+- 它会质疑使用者的用词，因为现有术语表对该词的定义不同。
 
 ## Where it fits
 
-`grill-with-docs` is the head of the main build chain:
+`grill-with-docs` 是主要构建链的起点：
 
 ```txt
 grill-with-docs → to-spec → to-tickets → implement → code-review → retro
 ```
 
-It comes before anything is written down as a spec. It produces the shared understanding and settled vocabulary that [to-spec](https://aihero.dev/skills-to-spec) then synthesises without interviewing you again. Its close neighbours are [grill-me](https://aihero.dev/skills-grill-me), the same interview with no repo and no files, and [domain-modeling](https://aihero.dev/skills-domain-modeling), the glossary-and-ADR discipline it drives; both use the [grilling](https://aihero.dev/skills-grilling) primitive for the interview. Upstream of it, [wayfinder](https://aihero.dev/skills-wayfinder) charts efforts too large for one session and can hand parts of the map back down to it. When you're unsure which skill or flow fits, [ask-matt](https://aihero.dev/skills-ask-matt) routes you.
+它位于编写规格说明之前，形成共同理解并确定词汇，随后 [to-spec](https://aihero.dev/skills-to-spec) 据此综合成文，不再重新访谈。相邻技能是 [grill-me](https://aihero.dev/skills-grill-me) 和 [domain-modeling](https://aihero.dev/skills-domain-modeling)：前者运行同样的访谈，但不需要仓库、不写文件；后者提供它所驱动的术语表与 ADR 建模方法。两个访谈入口都使用 [grilling](https://aihero.dev/skills-grilling) 这一基础技能。上游的 [wayfinder](https://aihero.dev/skills-wayfinder) 为一次会话容纳不下的工作绘制地图，再把其中适合的部分交回本技能。不确定该用哪个技能或流程时，使用 [ask-matt](https://aihero.dev/skills-ask-matt) 路由。

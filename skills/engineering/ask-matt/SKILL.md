@@ -1,97 +1,99 @@
 ---
 name: ask-matt
-description: Ask which skill or flow fits your situation. A router over the skills in this repo.
+description: 询问哪项技能或哪条流程适合当前情况。本仓库技能的路由入口。
 disable-model-invocation: true
 ---
 
-# Ask Matt
+# 向 Matt 问路
 
-You don't remember every skill, so ask.
+记不住每项技能，就来问。路由只给建议，不代为启动仅用户主动调用的技能。
 
-Before stating what a skill does or recommending a step be skipped, read that skill's SKILL.md: the summaries here are for orientation only.
+本 fork 的输出偏好：默认用简体中文提问、解释和交付；用户指定其他语言时遵从用户。代码、命令、路径、工具名、技术标识以及约定的模板字段遵循目标项目约定。
 
-A **flow** is a path through the skills. Most paths run along one **main flow**, and two **on-ramps** merge onto it. Everything else is standalone, or a vocabulary layer that runs underneath.
+在说明某项技能的行为，或建议跳过某一步之前，先读取该技能的 `SKILL.md`：这里的摘要只用于帮助定位。
 
-## The main flow: idea → ship
+**流程（flow）**是穿过多项技能的一条路径。大多数路径沿着一条**主流程**前进，**接入路径**再汇入主流程。其余技能独立使用，或组成贯穿其他技能底层的词汇层。
 
-The route most work travels. You have an idea and want it built.
+## 主流程：想法 → 交付
 
-1. **`/grill-with-docs`** sharpens the idea by interview. Start here whenever you are **working in a working directory**: it's stateful, retaining what it learns in `GLOSSARY.md` and ADRs. (No working directory? Use `/grill-me` instead, covered under Standalone. Both run the same `/grilling` primitive; `grill-with-docs` is the one that leaves a paper trail, which makes it the better of the two whenever a repo is there to leave it in.)
-2. **Branch: can you settle every question in conversation?** If a question needs a runnable answer (state, business logic, a UI you have to see), detour through a prototype, bridged by **`/handoff`** in both directions (a prototype lives in its own directory, which is exactly what `/handoff` is for; see Phase boundaries):
-   - **`/handoff`** out, then open a fresh session against that file,
-   - **`/prototype`** to answer the question with throwaway code,
-   - **`/handoff`** back what you learned, and reference it from the original idea thread.
-3. **Branch: is this a multi-session build?**
-   - **Yes** → **`/to-spec`** (turn the thread into a spec), then **`/to-tickets`** to split it into tracer-bullet tickets, each declaring its **blocking edges**. Then work the tickets one of two ways:
-     - **`/implement`** per ticket, **`/clear`ing context between each one**. On a local tracker that's one file per ticket under `.scratch/<feature>/issues/`, worked blockers-first by hand; on a real tracker the edges become native blocking links, so any ticket whose blockers are done can be grabbed. Each ticket is self-contained, so the last one's context is disposable.
-     - **`/implement-spec`** for the whole spec in one run. It reads the tickets as a **task graph**, runs implementer subagents across the ready **frontier** in parallel, and lands everything on one **integration branch**. Reach for it when you'd rather orchestrate the build than drive each ticket yourself.
-   - **No** → **`/implement`** right here, in the same context window.
+大多数工作走这条路：已经有了想法，希望把它实现出来。
 
-   Either way, the code gets built by driving **`/tdd`** (one red-green slice at a time) and closes out with **`/code-review`**, a two-axis review (Standards + Spec) of the diff. `/implement` runs both per ticket; `/implement-spec`'s implementers each drive `/tdd`, and it runs one `/code-review` over the integration branch. Reach for **`/tdd`** on its own when you just want to build a concrete behaviour test-first without a full spec, and **`/code-review`** on its own whenever you want to review a branch or PR against a fixed point.
+1. **`/grill-with-docs`** 通过访谈明确想法。只要**在工作目录中开展工作**，就从这里开始：它会保留状态，把了解到的内容记录在 `GLOSSARY.md` 和架构决策记录（ADR）中。（没有工作目录？改用「独立技能」中的 `/grill-me`。两者都运行同一个 `/grilling` 基础技能；`grill-with-docs` 会留下文档记录，所以只要有仓库可供记录，它就是两者中更合适的选择。）
+2. **分支：所有问题都能通过对话解决吗？** 如果某个问题需要可运行的答案（状态、业务逻辑，或必须亲眼看到的 UI），就绕行原型，并在去程和回程都用 **`/handoff`** 交接（原型位于独立目录中，这正是 `/handoff` 的用途；见「阶段边界」）：
+   - 用 **`/handoff`** 交出上下文，然后基于交接文件开启新会话。
+   - 用 **`/prototype`** 以一次性代码回答问题。
+   - 用 **`/handoff`** 交回了解到的内容，并在原来的想法讨论中引用交接文件。
+3. **分支：这次实现是否跨越多个会话？**
+   - **是** → 先用 **`/to-spec`** 把讨论转成规格说明（spec），再用 **`/to-tickets`** 拆成曳光弹工单（tracer-bullet tickets），每张工单都声明自己的**阻塞关系（blocking edges）**。随后选择以下一种方式处理工单：
+     - 每张工单运行一次 **`/implement`**，**两张工单之间用 `/clear` 清空上下文**。使用本地工单跟踪器时，每张工单对应 `.scratch/<feature>/issues/` 下的一个文件，由用户手动按「先完成阻塞工单」的顺序推进；使用在线工单跟踪器时，阻塞关系会变成原生阻塞链接，因此任何阻塞工单均已完成的工单都可以领取。每张工单都自包含，上一张工单的上下文可以丢弃。
+     - 用 **`/implement-spec`** 一次处理整份规格说明。它把工单读成**任务图（task graph）**，沿已就绪的**前沿（frontier，即阻塞工单均已完成的可执行工单集合）**并行运行实现子代理（implementer subagents），把所有成果汇入同一条**集成分支（integration branch）**。如果更愿意编排整次实现，而不是亲自逐张推动工单，就用它。
+   - **否** → 就在这里、在同一个上下文窗口中运行 **`/implement`**。
 
-   When the work goes up as a pull request, **`/pr`** shapes the body: the smallest visual that shows the change, before/after evidence that it works, and a one-way or two-way door call. It's model-invoked, so the agent reaches for it whenever it writes a PR.
+   无论选择哪条路径，实现都通过 **`/tdd`** 推进（每次完成一个红灯 → 绿灯切片），最后用 **`/code-review`** 对差异做双轴审查：Standards（编码标准）和 Spec（规格说明）。`/implement` 会对每张工单运行这两项技能；`/implement-spec` 的每个实现子代理分别运行 `/tdd`，再由 `/implement-spec` 对集成分支做一次 `/code-review`。只想先写测试来实现一个具体行为、而不需要完整规格说明时，可以单独用 **`/tdd`**；希望依据固定的基准审查分支或 PR 时，可以单独用 **`/code-review`**。
 
-4. **`/retro`** closes the loop. After a build, and especially one that went sideways, it looks back over the session and suggests changes to the agent's **environment**, not the code: navigation pointers, automated checks, the coding standards `/code-review` enforces, steering files, tooling. Mechanical mistakes become deterministic checks; judgement calls become coding standards. The next build then starts from a better environment.
+   工作以拉取请求（PR）提交时，**`/pr`** 组织正文：用最小的可视化展示变更，给出证明其有效的前后对比证据，并判断这是单向门还是双向门决策。它可由模型调用，因此 agent 每次编写 PR 时都会使用它。
 
-### Context hygiene
+4. **`/retro`** 完成复盘。实现结束后，尤其是过程偏离预期时，它回顾整个会话，建议修改 agent 的**环境**，而不是业务代码：导航指针、自动检查、`/code-review` 执行的编码标准、引导文件和工具。机械性错误转成确定性检查；需要判断的取舍转成编码标准。这样，下一次实现就从更好的环境开始。
 
-Keep steps 1–3 in **one unbroken context window** (don't compact or clear until after `/to-tickets`) so the grilling, spec, and tickets all build on the same thinking. Each `/implement` then starts fresh, working from the ticket. Run `/retro` in the session it's looking back on, before you clear; after clearing, point it at that session's log instead.
+### 上下文维护
 
-The limit on this is the **[smart zone](https://www.aihero.dev/ai-coding-dictionary/smart-zone)**: the window (~150k tokens on state-of-the-art models) within which the model still reasons sharply. If a session approaches it before `/to-tickets`, don't push on degraded; `/compact` at the nearest phase boundary and carry on (see Phase boundaries).
+让步骤 1 至 3 保持在**同一个不间断的上下文窗口**中（在 `/to-tickets` 完成前，不压缩或清空上下文），这样访谈、规格说明和工单都基于同一套思考。之后，每次 `/implement` 都从新上下文开始，依据工单开展工作。在清空前，先在被回顾的会话中运行 `/retro`；已经清空时，改为让它读取那个会话的日志。
 
-## On-ramps
+这条原则受**[智能区](https://www.aihero.dev/ai-coding-dictionary/smart-zone)**限制：这是模型仍能清晰推理的窗口范围（当前最先进模型约为 150k tokens）。如果会话在 `/to-tickets` 前就接近这个范围，不要在推理退化后硬撑；在最近的阶段边界执行 `/compact`，然后继续（见「阶段边界」）。
 
-A starting situation that generates work, then merges onto the main flow.
+## 接入路径
 
-- **Bugs and requests piling up** → **`/triage`**. It moves issues through triage roles and produces agent-ready issues, which **`/implement`** later picks up.
+从某种初始情况产生工作，再汇入主流程。
 
-  Triage is only for issues **you didn't create**: bug reports, incoming feature requests, anything that arrives raw. Tickets that `/to-tickets` produced are already agent-ready, so **don't triage them**.
+- **缺陷报告和请求堆积** → **`/triage`**。它让工单经过各分诊角色，生成 agent 可直接处理的工单，随后由 **`/implement`** 领取。
 
-- **Something's broken** → **`/diagnosing-bugs`**. For the hard ones: the bug that resists a first glance, the intermittent flake, the regression that crept in between two known-good states. It refuses to theorise until it has a **tight feedback loop** (one command that already goes red on *this* bug), then fixes with a regression test. Once the fix is in, run **`/retro`** in the same session to ask what would have prevented the bug; where the real finding is that there's no good seam to lock it down, that's a job for **`/improve-codebase-architecture`**.
+  分诊只适用于**不是自己创建**的工单：缺陷报告、外部功能请求，以及任何未经整理就进入的事项。`/to-tickets` 生成的工单已经可供 agent 处理，因此**不要再对它们做分诊**。
 
-- **A huge, foggy effort: a greenfield project or a huge feature build, too big for one session** → **`/wayfinder`**, the most cognitively demanding flow here. When the way from here to the destination isn't visible yet, it charts a **shared map** of **decision tickets** on the issue tracker and resolves them one at a time, producing **decisions, not deliverables**, until the fog is pushed back and the way is clear. Where **`/grill-with-docs`** sharpens an idea you can hold in one session, wayfinder is for the idea you can't, and it's slower and denser, so save it for exactly that, never a well-scoped feature.
+- **某处出了故障** → **`/diagnosing-bugs`**。用于难处理的缺陷：一眼看不出原因的错误、间歇性失败，或在两个已知正常状态之间引入的回归。它在建立**紧凑反馈循环（tight feedback loop）**之前拒绝推测原因；这个循环是一条已经能对*当前缺陷*亮红灯的命令。随后，它通过回归测试完成修复。修复完成后，在同一会话中运行 **`/retro`**，追问什么措施本可预防这个缺陷；如果真正的发现是缺少合适的接缝来固定该行为，就交给 **`/improve-codebase-architecture`**。
 
-  When the map clears, **it hands off, it doesn't build**: merge onto the main flow at **`/to-spec`**, which collapses the map's linked decisions into a buildable plan, then `/to-tickets` and `/implement` as usual. Looping the map straight into `/implement` skips that collapse and throws the linked detail away, so go straight to `/implement` only when the effort turned out genuinely small.
+- **庞大且方向不明的工作：全新项目或大型功能实现，一个会话装不下** → **`/wayfinder`**，这是本仓库认知负担最高的流程。当从当前位置到目标的路线仍不可见时，它会在工单跟踪器上用**决策工单**绘制一张**共享地图**，逐张解决，产出的是**决策，而非交付物**，直到迷雾退去、路线清晰。**`/grill-with-docs`** 用于在一个会话内能容纳的想法，wayfinder 用于装不下的想法；后者更慢、信息更密集，因此只在这种情况下使用，绝不用来处理范围已经清楚的功能。
 
-## Codebase health
+  地图清晰后，**它交接，不实现**：从 **`/to-spec`** 汇入主流程，把地图中互相链接的决策整合成可实现的计划，然后照常运行 `/to-tickets` 和 `/implement`。把地图直接送入 `/implement` 会跳过整合，丢掉链接中的细节，因此只有工作最终确实很小时，才直接进入 `/implement`。
 
-Not feature work, just upkeep.
+## 代码库健康
+
+这里不是功能开发，而是日常维护。
 
 - **`/improve-codebase-architecture`**（代码库架构改进，仅用户主动调用）用于定期维护，让代码库更适合 agent 理解和修改。它先生成中文 HTML 报告，展示**深化机会（deepening opportunities）**，等待用户选中候选方案后才逐轮访谈，不直接执行重构。选中的候选产生一个可带回 `/grill-with-docs` 主流程的想法。它负责调查并找出候选；**`/codebase-design`**（见下文）提供选定模块的设计词汇和方法。
 
-## Vocabulary underneath
+## 底层词汇层
 
-Two model-invoked references that run *beneath* the other skills, each the single source of truth for its vocabulary. Reach for them directly when the **words**, not the process, are the problem; or let the skills above pull them in.
+两项可由模型调用的参考技能贯穿其他技能的*底层*，各自是对应词汇的唯一事实来源。问题出在**用词**而非流程时，可以直接使用；也可以让上面的技能调用它们。
 
-- **`/domain-modeling`**: sharpen the project's *domain* language: challenge a fuzzy term, resolve an overloaded word ("account" doing three jobs), record a hard-to-reverse decision as an ADR. It's the active discipline `/grill-with-docs` drives to keep `GLOSSARY.md` a clean glossary.
-- **`/codebase-design`** is the deep-module vocabulary (module, interface, depth, seam, adapter, leverage, locality) for designing a module's *shape*: a lot of behaviour behind a small interface at a clean seam. `/tdd` and `/improve-codebase-architecture` both speak it.
+- **`/domain-modeling`**：明确项目的*领域*语言，质疑模糊术语，消除同一词承担多种含义的问题（例如「account」承担三种职责），把难以撤销的决策记录为 ADR。`/grill-with-docs` 使用这套主动工作方法，让 `GLOSSARY.md` 始终是一份清晰的术语表。
+- **`/codebase-design`** 提供深模块词汇，用于设计模块的*形态*：在清晰的接缝处，用小接口承载大量行为。词汇包括模块（module）、接口（interface）、深度（depth）、接缝（seam）、适配器（adapter）、杠杆效应（leverage）和局部性（locality）。`/tdd` 和 `/improve-codebase-architecture` 都使用这套词汇。
 
-## Phase boundaries
+## 阶段边界
 
-A **phase** is a chunk of work inside a session: the grilling, the implementation, the QA. At the **boundary** between two of them you have five options, and picking between them is the fuzziest decision in this whole map:
+**阶段**是会话中的一段工作，例如访谈、实现或 QA。在两个阶段的**边界**，有五种选择；如何取舍，是整张地图中最依赖判断的决策：
 
-- **Continue**: stay put. Costs nothing, loses nothing.
-- **`/clear`**: empty the window, when nothing here matters to what's next.
-- **`/handoff`** writes a portable markdown file. Narrow: only for a **new harness**, a **new directory**, a **colleague**, or forking a side task **mid-phase**. What it buys is portability.
-- **Subagent**: send a tightly-scoped task to its own window and get a report back.
-- **`/compact`** compresses this context and seeds a fresh session with it. The **default**, at the bottom of the tree rather than the first reach.
+- **继续**：留在当前会话。不花成本，不损失信息。
+- **`/clear`**：清空窗口，适用于当前内容都与下一步无关的情况。
+- **`/handoff`**：写出可移植的 Markdown 文件。用途很窄，只用于切换到**新宿主**、进入**新目录**、交给**同事**，或在**阶段中途**分出旁支任务。它带来的是可移植性。
+- **子代理**：把范围严格限定的任务发到独立窗口，收回报告。
+- **`/compact`**：压缩当前上下文，用摘要初始化新会话。它是**默认选择**，但位于决策树底部，而不是首选。
 
-Read [PHASE-BOUNDARIES.md](PHASE-BOUNDARIES.md) for the ordered tree: the five questions, the reasoning behind each branch, and why the primary-source cost makes **Continue** the one to rule out first. Make the decision **at** a boundary; mid-phase, continue or split the rest into subagents.
+读取本技能目录中的 [PHASE-BOUNDARIES.md](PHASE-BOUNDARIES.md)，了解有序决策树：五个问题、每条分支的理由，以及为什么一手资料的损失成本要求先判断能否**继续**。在**边界处**决策；阶段中途则继续，或把剩余工作拆给子代理。
 
-## Standalone
+## 独立技能
 
-Off the main flow entirely.
+完全位于主流程之外。
 
-- **`/grill-me`**: the same relentless interview as `/grill-with-docs`, but **stateless**: it saves nothing locally and builds no `GLOSSARY.md`. Reach for it when you are **not working in a working directory** (sharpening a plan, a design, a piece of writing, anything with no repo under it). If you are in a working directory, use `/grill-with-docs` instead: it runs the same interview and leaves a paper trail, so it is strictly the better one.
-- **`/grilling`** is the interview primitive itself: rounds, the frontier, facts are the agent's job and decisions are yours. `/grill-me` and `/grill-with-docs` are the two named ways in, and `/triage`, `/wayfinder` and `/improve-codebase-architecture` all run it internally. Reach for it directly only when you want the interview with no wrapper around it.
-- **`/prototype`** is a small, throwaway program that answers one design question: does this state model feel right, or what should this UI look like. Throwaway is a constraint on how the code is written, not a promise to destroy it: the answer folds into the real code, and the prototype itself is kept as a **primary source** on a `prototype/<name>` branch out of main, pointed at from the implementation issue. It's the detour in step 2 of the main flow, but reach for it any time a design question is hard to settle on paper.
-- **`/research`**: delegate reading legwork to a **background agent**: it investigates a question against **primary sources**, then leaves a cited Markdown file in the repo. Keep working while it reads. The file it produces is something to take *into* the main flow at `/grill-with-docs`, since research feeds the thinking rather than replacing it.
-- **`/to-questionnaire`** comes in when the thing blocking you isn't in your head or the codebase but in **someone else's**, and it writes them a questionnaire to fill in. It's the inverse of `/grill-me`: instead of interviewing you about the subject, it interviews you about the **send** (who it's going to, what you need back) and aims the questions at the gap. What comes back is material for `/grill-with-docs` or `/to-spec`.
-- **`/wizard`** is for the steps only a **human** can take: provisioning infrastructure, setting up credentials or CI secrets, clicking through an unfamiliar third-party dashboard, running a one-off migration or cutover. It generates an interactive bash script that opens each URL, captures each value, and writes it into `.env` and GitHub secrets, so the procedure stops being something you re-explain to an agent every time. Model-invoked, so the agent reaches for it the moment it hits a wall only you can pass. If the agent could just do it itself, it should; this is for where a human is genuinely in the loop.
-- **`/wait-what`** is the corrective for a message that didn't land. Use it mid-conversation, inside any other skill, and the agent re-pitches what it just said with the context you were missing, in plain English, using the `GLOSSARY.md` vocabulary. It works after the fact; `/grill-with-docs` is the upfront cure, because a shared language agreed early is what stops the jargon arriving at all.
-- **`/teach`**: learn a concept over multiple sessions, using the current directory as a stateful workspace.
-- **`/writing-for-agents`** is the reference for writing documents agents consume: skills, AGENTS.md, pointed-at docs.
+- **`/grill-me`**：与 `/grill-with-docs` 相同的持续追问式访谈，但**不保留状态**：不保存本地内容，也不创建 `GLOSSARY.md`。**不在工作目录中开展工作**时使用，例如明确计划、设计或写作内容，以及任何没有仓库的事项。如果在工作目录中，改用 `/grill-with-docs`：它运行相同的访谈并留下文档记录，因此更合适。
+- **`/grilling`** 是访谈基础技能本身：按轮次提问、推进问题前沿，事实调查由 agent 负责，决策由用户负责。`/grill-me` 和 `/grill-with-docs` 是两个命名入口，`/triage`、`/wayfinder` 和 `/improve-codebase-architecture` 都在内部运行它。只有需要不带包装入口的访谈时，才直接使用它。
+- **`/prototype`** 是回答一个设计问题的小型一次性程序：状态模型是否合适，或 UI 应该是什么样。「一次性」约束的是代码写法，并不承诺销毁原型：答案会融入正式代码，原型本身则作为**一手资料（primary source）**，保存在从 `main` 分出的 `prototype/<name>` 分支上，由实现工单引用。它是主流程步骤 2 的绕行路线，但只要设计问题难以在纸面上解决，就可以使用。
+- **`/research`**：把阅读调查委派给**后台 agent**；它依据**一手资料**调查问题，然后在仓库中留下带引用的 Markdown 文件。它阅读时，用户可以继续工作。产出的文件适合从 `/grill-with-docs` 带入主流程，因为研究为思考提供材料，而不是取代思考。
+- **`/to-questionnaire`**：阻碍不在用户的头脑或代码库中，而在**其他人**那里时使用；它为对方编写一份待填写的问卷。它与 `/grill-me` 的方向相反：不访谈用户对主题的认识，而是访谈**发送安排**（发给谁、希望收到什么），再让问题针对信息缺口。收回的答案是 `/grill-with-docs` 或 `/to-spec` 的材料。
+- **`/wizard`** 用于只有**人**能完成的步骤：配置基础设施、设置凭据或 CI secrets、操作陌生的第三方控制台，以及运行一次性迁移或切换。它生成交互式 bash 脚本，逐个打开 URL、收集各项值，再写入 `.env` 和 GitHub secrets，从而不必每次都向 agent 重新解释流程。它可由模型调用，因此 agent 遇到只有用户才能突破的障碍时就会使用。如果 agent 自己能完成，就应该自己完成；这个技能只用于确实需要人工参与的情况。
+- **`/wait-what`** 用于补救没有讲明白的消息。可在对话中途、任何其他技能内部使用；agent 会补上缺失的上下文，使用 `GLOSSARY.md` 中的词汇，以浅白英语重新解释刚才的内容。它是事后补救；`/grill-with-docs` 是事前预防，因为及早约定共享语言，才能从源头防止术语造成理解障碍。
+- **`/teach`**：跨多个会话学习一个概念，把当前目录作为保留状态的工作区。
+- **`/writing-for-agents`** 是编写 agent 所读文档的参考：技能、`AGENTS.md`，以及通过指针访问的文档。
 
-## Precondition
+## 前置条件
 
-**`/setup-matt-pocock-skills`**: run before your first engineering flow to configure the issue tracker, triage labels, and doc layout the other skills assume. Custom issue trackers also work.
+**`/setup-matt-pocock-skills`**：在首次运行工程流程前，由用户运行它，配置其他技能所依赖的工单跟踪器、分诊标签和文档布局。也支持自定义工单跟踪器。

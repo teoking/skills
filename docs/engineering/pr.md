@@ -1,79 +1,90 @@
 ## What it does
 
-`pr` defines the shape of a pull request body: a **Summary** that shows the change, **Evidence** that it works, and a **Merge Danger** call on how risky it is to land. It is a format reference, not a workflow. It does not push a branch, open the PR, or decide what goes into it. It tells the [agent](https://www.aihero.dev/ai-coding-dictionary/agent) what the body should look like when it writes one.
+`pr` 定义 PR 正文的结构：用 **Summary** 展示变更，用 **Evidence** 证明变更有效，用 **Merge Danger** 判断合并风险。它是格式参考，不是工作流程；不会推送分支、创建 PR，或决定 PR 包含什么内容，只告诉 [agent](https://www.aihero.dev/ai-coding-dictionary/agent) 编写正文时应采用什么结构。
 
-The summary is a visual, not a paragraph. A default PR body describes the diff in prose. This one picks the **smallest view** that makes the key point clear (pseudocode, a call tree, a component tree, a file tree, a Mermaid diagram, or a shaped diff) and keeps the words around it brief. The reviewer already has the diff open, so the body shows them its shape before they read it.
+摘要是可视化视图，而不是一段文字。默认的 PR 正文用文字描述差异，本技能则选择能讲清关键点的**最小视图**，例如伪代码、调用树、组件树、文件树、Mermaid 图或适合主题的差异展示，并让周围文字保持简短。审查者已经打开了差异，正文应让他们在细读前先看清变更的结构。
 
 ## When to reach for it
 
-Type `/pr`, or the agent reaches for it automatically whenever it is writing a PR body.
+输入 `/pr` 主动调用；agent 编写 PR 正文时也可以自动调用。
 
-| Your situation | Reach for |
+| 当前情况 | 选择 |
 | --- | --- |
-| A branch is ready and needs a body a reviewer can scan | `pr` |
-| The code is written but nobody has reviewed it yet | [code-review](https://aihero.dev/skills-code-review) first, then `pr` |
-| The PR is open and review comments are coming back | Nothing in this set yet; `pr` only writes the body |
+| 分支已准备好，需要一份便于审查者扫读的正文 | `pr` |
+| 代码已写好，但尚未审查 | 先用 [code-review](https://aihero.dev/skills-code-review)，再用 `pr` |
+| PR 已创建，开始收到审查评论 | 当前技能集合尚无对应技能；`pr` 只编写正文 |
 
-## The template
+## 模板结构
 
-Three sections, in this order:
+包含三个章节，顺序如下：
 
-- **Summary**: one or more small visuals, each placed next to the short text it supports. Use one, sometimes several, rarely all of them. Keep only the calls, files, props, and boundaries the reviewer needs.
-- **Evidence**: a before and after. A screenshot is the strongest evidence when the change is visual and the [environment](https://www.aihero.dev/ai-coding-dictionary/environment) can take one. Otherwise, use the exact test that failed and now passes, written as pseudocode, or the console output that changed.
-- **Merge Danger**: whether the change is a **one-way door** or a **two-way door**, and its **blast radius**. A two-way door is cheap to reverse; a one-way door (a destructive migration, a public API removal, a hard-to-reverse decision) is not. Blast radius names what could break if the change is wrong: layout shift, consumers of an API, mobile responsiveness.
+- **Summary**：一个或多个小型可视化视图，每个都放在它所支持的简短文字旁边。通常使用一个，有时几个，很少全部使用。只保留审查者需要的调用、文件、props 和边界。
+- **Evidence**：展示前后对比。当变更是视觉变化，且[环境](https://www.aihero.dev/ai-coding-dictionary/environment)具备截图能力时，截图是最强证据。否则，用伪代码展示同一个测试在变更前失败、变更后通过的情况，或展示发生变化的控制台输出。
+- **Merge Danger**：说明变更是**单向门（one-way door）**还是**双向门（two-way door）**，以及它的**影响范围（blast radius）**。双向门容易逆转；单向门则不容易，例如破坏性迁移、移除公开 API 或难以逆转的决策。影响范围指出变更出错时哪些地方可能受损，例如布局偏移、API 使用方或移动端响应式布局。
 
-The door call is the leading idea. It changes "is this safe to merge?" from a gut feeling into a stated claim the reviewer can disagree with. It also tells them where to spend their [human review](https://www.aihero.dev/ai-coding-dictionary/human-review). Skim a two-way door with a small blast radius, and read a one-way door slowly.
+判断是哪种门是本技能的核心概念。它把「是否可以安全合并」从直觉变成明确陈述，让审查者能够提出异议，也告诉他们应在哪里投入[人工审查](https://www.aihero.dev/ai-coding-dictionary/human-review)精力：
+
+- **影响范围小的双向门：** 可以快速浏览。
+- **单向门：** 应仔细阅读。
 
 ## Common questions
 
-**Can I trust the agent's own door call?**
+**能相信 agent 自己对单向门或双向门的判断吗？**
 
-Not blindly, and that is the point of stating it. The agent that wrote the change is the one grading it, so be most suspicious when it says "two-way, small blast radius". The diff also often hides whether a change can be reversed. As one user put it, "rolling back a commit won't unsend a batch of emails", and a flagged rollout stays two-way only until the first write lands in the new format. The skill gives the agent a definition (destructive actions and hard-to-reverse decisions are one-way), not a checklist, so check the Merge Danger line most carefully. Two things help: make sure the agent has the [ticket](https://www.aihero.dev/ai-coding-dictionary/ticket) or [spec](https://www.aihero.dev/ai-coding-dictionary/spec) in front of it, not just the diff, and write down the changes your repo always treats as one-way (schema migrations, anything that ships outward or deletes) where the agent will read them before it makes the call.
+不能盲信，这正是把判断写出来的意义。编写变更的 agent 也在给自己的变更评级，因此当它声称「双向门、影响范围小」时，尤其要怀疑。差异也常常无法体现变更是否可逆。一位用户说过：「rolling back a commit won't unsend a batch of emails」。通过功能开关控制的发布，也只有在首次按新格式写入之前才保持可逆。技能给 agent 的是定义，即破坏性操作和难以逆转的决策属于单向门，而不是检查清单，因此 Merge Danger 一项最值得仔细核对。两件事有帮助：
 
-**Does it open the PR for me?**
+- 确保 agent 看到的是[工单](https://www.aihero.dev/ai-coding-dictionary/ticket)或[规格说明](https://www.aihero.dev/ai-coding-dictionary/spec)，而不只是差异。
+- 把仓库中始终视为单向门的变更，例如 schema 迁移、任何向外发送或删除内容的操作，记录在 agent 做判断前会读取的位置。
 
-No. `pr` covers only the body. [implement](https://aihero.dev/skills-implement) ends by committing to the current branch. Requests for a skill or option that opens the PR (a `/to-pr`, or `implement` opening a PR instead of committing) are still open proposals. One user's workaround is a one-sentence local override of `implement` that tells it to open a PR. [implement-spec](https://aihero.dev/skills-implement-spec) is the exception: it opens a draft PR when your issue tracker closes work through PRs or when you ask for one. Because `pr` is model-invoked, the agent uses this shape for the body whenever you ask it to open a PR.
+**它会代为创建 PR 吗？**
 
-**Won't it just produce another wall of text and diagrams?**
+不会。`pr` 只负责正文。相关技能的边界如下：
 
-The skill is designed to prevent that, but it can still happen. Users' complaint about agent PR bodies is consistent: "a long summary but all I need to know is what changed, how it was verified, what could break, and whether it's safe to merge." The skill tells the agent to skip preambles, keep prose brief, and pick the smallest view, usually one visual and rarely all of them. If you still get a stack of diagrams, the agent has ignored that. If the body is huge because the diff is huge, the problem is the size of the PR, and `pr` will not split it for you.
+- [implement](https://aihero.dev/skills-implement) 以提交到当前分支结束。创建 PR 的技能或选项，例如 `/to-pr`，或让 `implement` 创建 PR 而不是提交，仍是尚未实现的提议。一位用户的解决办法是在本地用一句话覆盖 `implement` 的要求，让它创建 PR。
+- [implement-spec](https://aihero.dev/skills-implement-spec) 是例外：当工单跟踪器通过 PR 完成工作，或用户要求创建 PR 时，它会创建草稿 PR。
 
-**My repo already has a PR template. Which one wins?**
+因为 `pr` 可由模型调用，当用户要求 agent 创建 PR 时，agent 会用本技能的结构编写正文；创建动作本身不属于 `pr`。
 
-Neither, by default. `pr` has its own template and does not look for `.github/pull_request_template.md` or anything like it. Several users asked for the skill to use the repo's template. If you do nothing, the agent has two competing instructions for the same document. Settle it in your repo's agent docs, for example by filling the repo template and putting Summary, Evidence and Merge Danger under it.
+**会不会又生成一大堆文字和图？**
 
-**Is the output HTML? Why doesn't the Mermaid diagram render?**
+本技能就是为避免这种情况设计的，但仍可能发生。用户对 agent 编写的 PR 正文有一致的抱怨：「a long summary but all I need to know is what changed, how it was verified, what could break, and whether it's safe to merge.」技能要求省略开场白、文字简短，并选择最小视图，通常一个，很少全部使用。若仍得到一大堆图，说明 agent 没有遵循要求。若正文庞大是因为差异本身庞大，问题在于 PR 的规模；`pr` 不会代为拆分 PR。
 
-The output is a markdown PR body, not an HTML page. GitHub and GitLab render Mermaid blocks in a PR description, but a terminal does not, so the diagram looks like raw text while the agent is still showing it to you locally. Users on CLI harnesses have worked around that with an ASCII Mermaid renderer or by having the agent attach an HTML version to the PR. Mermaid is one of six views. A call tree, file tree or shaped diff reads the same everywhere.
+**仓库已有 PR 模板，哪一份优先？**
 
-**Can it sort through the review comments that come back?**
+默认没有哪一份优先。`pr` 有自己的模板，不会查找 `.github/pull_request_template.md` 或类似文件。已有多位用户要求技能采用仓库模板。若不作处理，agent 就会面对针对同一文档的两套竞争指令。应在仓库的 agent 文档中明确安排，例如填写仓库模板，并在其中放入 Summary、Evidence 和 Merge Danger。
 
-No. It writes the body and stops. Users have asked more than once for a way to triage comments from other developers or review bots (which are worth acting on, which are non-issues). This skill does not do that.
+**输出是 HTML 吗？为什么 Mermaid 图没有渲染？**
 
-**Does it keep the body up to date as the PR changes?**
+输出是 Markdown 格式的 PR 正文，不是 HTML 页面。GitHub 和 GitLab 会在 PR 描述中渲染 Mermaid 代码块，但终端不会，因此 agent 在本地展示时，看起来仍是原始文本。使用 CLI 宿主的用户曾通过 ASCII Mermaid 渲染器，或让 agent 为 PR 附加 HTML 版本来解决。Mermaid 只是六种视图之一；调用树、文件树和适合主题的差异展示在各处都能以相同方式阅读。
 
-No. It writes the body at one point in time, and a PR that changes under review leaves that body stale. Ask the agent to rewrite the body after a large change. The agent is writing a PR body again, so it uses the same shape.
+**它能整理收到的审查评论吗？**
 
-**My change has no UI. What goes in Evidence?**
+不能。它编写正文后就停止。用户曾多次希望有一种方式分诊其他开发者或审查机器人给出的评论，判断哪些值得处理、哪些并非问题。本技能不做这件事。
 
-Everything except the screenshot. The screenshot is the strongest evidence only when the change is visual. For a migration, a background job or a refactor, the evidence is the exact test that failed before and passes now, or the console output that changed. "Tests are green" on its own is a claim, not a before and after.
+**PR 变化后，它会持续更新正文吗？**
 
-**Can it mark the body as written by an LLM?**
+不会。它只在某个时间点编写正文；PR 在审查期间发生变化，就会使正文过时。较大变更后，请 agent 重写正文。此时 agent 再次编写 PR 正文，会使用同样的结构。
 
-Not by itself. One user's approach is a standing instruction in the repo's agent docs that every issue, comment, and PR the agent writes ends with a disclosure line. That rule belongs in the repo, where it covers everything the agent posts, rather than in a template for one kind of document.
+**变更没有 UI，Evidence 中放什么？**
+
+使用截图以外的证据。只有视觉变更时，截图才是最强证据。迁移、后台任务或重构应展示同一个测试在变更前失败、变更后通过的情况，或发生变化的控制台输出。单独写「Tests are green」只是一个断言，不是前后对比。
+
+**它能标注正文由 LLM 编写吗？**
+
+本技能不会自行标注。一位用户的做法是在仓库的 agent 文档中设置长期指令，要求 agent 编写的每个工单、评论和 PR 都以披露说明结束。这条规则应属于仓库，从而覆盖 agent 发布的所有内容，而不是只放在某一种文档的模板中。
 
 ## It's working if
 
-- You can tell what the PR changes from the Summary visual alone, before opening the diff.
-- The body has no preamble: it starts at the Summary heading.
-- The Evidence section shows a before and an after, not a claim that tests pass.
-- Every PR states a door and a blast radius, and the one-way doors are the ones you slow down on.
+- 在打开差异之前，仅看 Summary 的可视化视图就能知道 PR 改了什么。
+- 正文没有开场白，直接从 Summary 标题开始。
+- Evidence 展示前后对比，而不只是声称测试通过。
+- 每个 PR 都说明是哪种门及其影响范围；遇到单向门时，审查者会放慢速度仔细核查。
 
 ## Where it fits
 
-`pr` comes between review and retro when the build ships as a pull request: `to-spec → to-tickets → implement → code-review → pr → retro`. It is model-invoked, so it also fires on its own any time the agent writes a PR body outside that chain.
+当构建成果通过 PR 交付时，`pr` 位于审查与复盘之间：`to-spec → to-tickets → implement → code-review → pr → retro`。它可由模型调用，因此 agent 在这条链之外编写 PR 正文时，也可以自行调用。
 
-- [code-review](https://aihero.dev/skills-code-review) runs before it, because a PR body should describe a diff that has already been reviewed.
-- [implement](https://aihero.dev/skills-implement) produces the commits the body describes.
+- [code-review](https://aihero.dev/skills-code-review) 在它之前执行，因为 PR 正文应描述已审查过的差异。
+- [implement](https://aihero.dev/skills-implement) 生成正文所描述的提交。
 
-[ask-matt](https://aihero.dev/skills-ask-matt) routes across the whole set when you are unsure which skill the situation wants.
+不确定当前情况该选哪个技能时，[ask-matt](https://aihero.dev/skills-ask-matt) 可在整个技能集合中提供路由建议。

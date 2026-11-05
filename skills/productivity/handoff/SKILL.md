@@ -1,16 +1,18 @@
 ---
 name: handoff
-description: Compact the current conversation into a handoff document for another agent to pick up.
-argument-hint: "What will the next session be used for?"
+description: 将当前对话压缩为交接文档，供另一个 agent 接续工作。
+argument-hint: "下一次会话将用于什么？"
 disable-model-invocation: true
 ---
 
-Write a handoff document summarising the current conversation so a fresh agent can continue the work. Save to the temporary directory of the user's OS (`$TMPDIR`, else `/tmp`; `%TEMP%` on Windows) - not the current workspace.
+编写交接文档，总结当前对话，让新的 agent 能够继续工作。保存到用户操作系统的临时目录（`$TMPDIR`，未设置时使用 `/tmp`；Windows 使用 `%TEMP%`），而不是当前工作区。
 
-Include a "suggested skills" section in the document, naming which skills the next agent should call the Skill tool for.
+本 fork 的输出偏好：默认用简体中文提问、解释和交付；用户指定其他语言时遵从用户。代码、命令、路径、工具名、技术标识及约定的模板字段遵循目标项目约定。
 
-Do not duplicate content already captured in other artifacts (specs, plans, ADRs, issues, commits, diffs). Reference them by path or URL instead.
+在文档中加入「suggested skills」章节，列出下一个 agent 应通过 Skill 工具调用的技能。
 
-Redact any sensitive information, such as API keys, passwords, or personally identifiable information.
+不要重复其他产物中已经记录的内容（规格说明、计划、架构决策记录（ADR）、工单、提交、差异）。改用路径或 URL 引用。
 
-If the user passed arguments, treat them as a description of what the next session will focus on and tailor the doc accordingly.
+对所有敏感信息进行脱敏，例如 API 密钥、密码或可识别个人身份的信息。
+
+如果用户传入参数，将其视为对下一次会话重点的描述，并据此调整文档。

@@ -1,75 +1,77 @@
 ---
 name: to-spec
-description: "Turn the current conversation into a spec and publish it to the project issue tracker: no interview, just synthesis of what you've already discussed."
+description: "将当前对话整理为规格说明并发布到项目工单跟踪器：不重新访谈，只综合已经讨论的内容。"
 disable-model-invocation: true
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a spec. Do NOT interview the user; just synthesize what you already know.
+本技能根据当前对话上下文和对代码库的理解，生成规格说明（spec）。**不要访谈用户**，只综合已经掌握的信息。
 
-The issue tracker and triage label vocabulary should have been provided to you. If not, tell the user to run `/setup-matt-pocock-skills`.
+本 fork 的输出偏好：默认用简体中文提问、解释和交付；用户指定其他语言时遵从用户。代码、命令、路径、工具名、技术标识以及约定的模板字段遵循目标项目约定。
 
-## Process
+应已提供工单跟踪器及分诊标签词汇。如果尚未提供，告知用户运行 `/setup-matt-pocock-skills`。
 
-1. Explore the repo to understand the current state of the codebase, if you haven't already. Use the project's domain glossary vocabulary throughout the spec, and respect any ADRs in the area you're touching.
+## 流程
 
-2. Sketch out the seams at which you're going to test the feature. Existing seams should be preferred to new ones. Use the highest seam possible. If new seams are needed, propose them at the highest point you can. The fewer seams across the codebase, the better - the ideal number is one.
+1. 如果尚未探索仓库，先探索，了解代码库的当前状态。整篇规格说明使用项目领域术语表中的词汇，并遵循所涉及领域的所有架构决策记录（ADR）。
 
-Check with the user that these seams match their expectations.
+2. 概述将在哪些接缝（seam）测试该功能。优先使用已有接缝，而非新建接缝。使用尽可能高层的接缝。如果需要新接缝，也应在尽可能高层的位置提出。代码库中的接缝越少越好，理想数量是一个。
 
-3. Write the spec using the template below, then publish it to the project issue tracker. Apply the `ready-for-agent` triage label - no need for additional triage.
+与用户确认这些接缝是否符合其预期。
+
+3. 使用下面的模板编写规格说明，然后发布到项目工单跟踪器。添加 `ready-for-agent` 分诊标签，无须再做分诊。
 
 <spec-template>
 
 ## Problem Statement
 
-The problem that the user is facing, from the user's perspective.
+从用户视角描述用户面临的问题。
 
 ## Solution
 
-The solution to the problem, from the user's perspective.
+从用户视角描述问题的解决方案。
 
 ## User Stories
 
-A LONG, numbered list of user stories. Each user story should be in the format of:
+一份**篇幅长、带编号**的用户故事列表。每个用户故事应采用以下格式：
 
 1. As an <actor>, I want a <feature>, so that <benefit>
 
 <user-story-example>
-1. As a mobile bank customer, I want to see balance on my accounts, so that I can make better informed decisions about my spending
+1. 作为手机银行客户，我希望查看我的账户余额，以便更明智地决定如何支出。
 </user-story-example>
 
-This list of user stories should be extremely extensive and cover all aspects of the feature.
+这份用户故事列表应极其详尽，涵盖功能的所有方面。
 
 ## Implementation Decisions
 
-A list of implementation decisions that were made. This can include:
+列出已经作出的实现决策，可以包括：
 
-- The modules that will be built/modified
-- The interfaces of those modules that will be modified
-- Technical clarifications from the developer
-- Architectural decisions
-- Schema changes
-- API contracts
-- Specific interactions
+- 将构建或修改的模块
+- 这些模块中将修改的接口
+- 开发者提供的技术澄清
+- 架构决策
+- 数据模式变更
+- API 契约
+- 具体交互
 
-Do NOT include specific file paths or code snippets. They may end up being outdated very quickly.
+**不要包含具体文件路径或代码片段**，它们可能很快过时。
 
-Exception: if a prototype produced a snippet that encodes a decision more precisely than prose can (state machine, reducer, schema, type shape), inline it within the relevant decision and note briefly that it came from a prototype. Trim to the decision-rich parts, not a working demo, just the important bits.
+例外：如果原型生成的片段比文字更精确地表达了某项决策（例如状态机、reducer、数据模式或类型结构），将它内联到对应决策中，并简短注明它来自原型。只保留承载决策的部分，不要放入可运行的演示，只保留重要内容。
 
 ## Testing Decisions
 
-A list of testing decisions that were made. Include:
+列出已经作出的测试决策，包括：
 
-- A description of what makes a good test (only test external behavior, not implementation details)
-- Which modules will be tested
-- Prior art for the tests (i.e. similar types of tests in the codebase)
+- 好测试的标准说明（只测试外部行为，不测试实现细节）
+- 将测试哪些模块
+- 可供参考的既有测试（即代码库中类似类型的测试）
 
 ## Out of Scope
 
-A description of the things that are out of scope for this spec.
+描述不在本规格说明范围内的事项。
 
 ## Further Notes
 
-Any further notes about the feature.
+关于该功能的其他说明。
 
 </spec-template>

@@ -1,5 +1,5 @@
 interface:
-  display_name: "Ask Matt"
-  short_description: "Find the right skill or workflow"
+  display_name: "向 Matt 问路"
+  short_description: "找到适合当前情况的技能或流程"
 policy:
   allow_implicit_invocation: false

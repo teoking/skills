@@ -1,5 +1,5 @@
 interface:
-  display_name: "Setup Matt Pocock Skills"
-  short_description: "Configure a repo for the skills"
+  display_name: "配置 Matt Pocock 技能"
+  short_description: "为仓库配置技能所需的工单跟踪器、标签与领域文档布局"
 policy:
   allow_implicit_invocation: false

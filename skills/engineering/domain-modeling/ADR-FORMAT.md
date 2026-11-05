@@ -1,10 +1,10 @@
-# ADR Format
+# ADR 格式
 
-ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
+架构决策记录（ADR）存放在 `docs/adr/` 中，使用连续编号：`0001-slug.md`、`0002-slug.md` 等。
 
-Create the `docs/adr/` directory lazily: only when the first ADR is needed.
+按需创建 `docs/adr/` 目录：只有需要第一份 ADR 时才创建。
 
-## Template
+## 模板
 
 ```md
 # {Short title of the decision}
@@ -12,36 +12,36 @@ Create the `docs/adr/` directory lazily: only when the first ADR is needed.
 {1-3 sentences: what's the context, what did we decide, and why.}
 ```
 
-That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why*, not in filling out sections.
+标题简要概括决策，正文用 1 至 3 句话说明背景、决定和原因。仅此而已。ADR 可以只有一个段落。它的价值在于记录*做了什么决策*以及*为什么*，而不是填满各个章节。
 
-## Optional sections
+## 可选部分
 
-Only include these when they add genuine value. Most ADRs won't need them.
+只有确实增加价值时才包含以下部分。大多数 ADR 不需要它们。
 
-- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`): useful when decisions are revisited
-- **Considered Options**: only when the rejected alternatives are worth remembering
-- **Consequences**: only when non-obvious downstream effects need to be called out
+- **Status** 前置元数据（`proposed | accepted | deprecated | superseded by ADR-NNNN`）：重新审视决策时有用。
+- **Considered Options**：只有被否决的替代方案值得记住时才包含。
+- **Consequences**：只有需要指出不明显的后续影响时才包含。
 
-## Numbering
+## 编号
 
-Scan `docs/adr/` for the highest existing number and increment by one.
+扫描 `docs/adr/`，找到现有编号中的最大值，再加 1。
 
-## When to offer an ADR
+## 何时提议编写 ADR
 
-All three of these must be true:
+以下三项必须同时成立：
 
-1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will look at the code and wonder "why on earth did they do it this way?"
-3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
+1. **难以撤销**：以后改变主意需要付出显著成本。
+2. **缺少背景就令人费解**：未来的读者看到代码会问：「当时到底为什么要这样做？」
+3. **确实权衡过不同方案**：存在真正可行的替代方案，并且基于具体理由选定了其中一个。
 
-If a decision is easy to reverse, skip it: you'll just reverse it. If it's not surprising, nobody will wonder why. If there was no real alternative, there's nothing to record beyond "we did the obvious thing."
+如果决策容易撤销，就不写：到时候直接撤销即可。如果并不令人费解，就不会有人追问原因。如果没有真正的替代方案，除了「采用了显而易见的做法」也没有什么可记录。
 
-### What qualifies
+### 符合条件的决策
 
-- **Architectural shape.** "We're using a monorepo." "The write model is event-sourced, the read model is projected into Postgres."
-- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
-- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target. Not every library: just the ones that would take a quarter to swap out.
-- **Boundary and scope decisions.** "Customer data is owned by the Customer context; other contexts reference it by ID only." The explicit no-s are as valuable as the yes-s.
-- **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
-- **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
-- **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it; otherwise someone will suggest GraphQL again in six months.
+- **架构形态。**「采用 monorepo。」「写模型使用事件溯源，读模型投影到 Postgres。」
+- **上下文之间的集成模式。**「Ordering 和 Billing 通过领域事件通信，而不是同步 HTTP。」
+- **带来锁定成本的技术选择。**数据库、消息总线、认证服务提供方、部署目标。不是每个库都算，只记录那些更换需要一个季度的选择。
+- **边界与范围决策。**「Customer 数据由 Customer 上下文拥有；其他上下文只能通过 ID 引用。」明确不做什么，与明确做什么同样有价值。
+- **有意偏离显而易见的做法。**「因为 X，使用手写 SQL 而不是 ORM。」任何一个合理的读者会默认采用相反做法的决策都属于这一类。这些记录能防止下一位工程师把有意的选择「修正」掉。
+- **代码中看不出的约束。**「由于合规要求，不能使用 AWS。」「根据合作方 API 合同，响应时间必须低于 200 ms。」
+- **否决理由并不明显的替代方案。**如果考虑过 GraphQL，却因为不易察觉的理由选择了 REST，就记录下来；否则 6 个月后又会有人提议采用 GraphQL。

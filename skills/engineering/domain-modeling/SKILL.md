@@ -1,15 +1,17 @@
 ---
 name: domain-modeling
-description: Build and sharpen a project's domain model. Use when discussing codebase terminology, writing or editing a GLOSSARY.md, or recording or editing an ADR.
+description: 构建并完善项目的领域模型。讨论代码库术语、编写或编辑 GLOSSARY.md，或记录、编辑架构决策记录（ADR）时使用。
 ---
 
-# Domain Modeling
+# 领域建模
 
-Actively build and sharpen the project's domain model as you design. This is the *active* discipline: challenging terms, inventing edge-case scenarios, and writing the glossary and decisions down the moment they crystallise. (Merely *reading* `GLOSSARY.md` for vocabulary is not this skill: that's a one-line habit any skill can do. This skill is for when you're changing the model, not just consuming it.)
+在设计过程中，主动构建并完善项目的领域模型（domain model）。这是一套*主动*建模方法：质疑术语、构造边界场景，并在术语和决策明确的当下将其写入文件。（仅为使用词汇而*读取* `GLOSSARY.md` 不属于本技能：任何技能都可以用一句指令养成这一习惯。本技能用于修改模型，而不只是使用模型。）
 
-## File structure
+默认使用简体中文提问、解释和交付；用户指定其他语言时遵从用户。代码、命令、路径、工具名、技术标识以及约定的模板字段遵循目标项目约定。
 
-Most repos have a single context:
+## 文件结构
+
+大多数仓库只有一个上下文：
 
 ```
 /
@@ -21,54 +23,54 @@ Most repos have a single context:
 └── src/
 ```
 
-If a `GLOSSARY-MAP.md` exists at the root, the repo has multiple contexts. The map points to where each one lives:
+如果根目录存在 `GLOSSARY-MAP.md`，说明仓库有多个上下文。该映射文件指明每个上下文的位置：
 
 ```
 /
 ├── GLOSSARY-MAP.md
 ├── docs/
-│   └── adr/                          ← system-wide decisions
+│   └── adr/                          ← 系统级决策
 ├── src/
 │   ├── ordering/
 │   │   ├── GLOSSARY.md
-│   │   └── docs/adr/                 ← context-specific decisions
+│   │   └── docs/adr/                 ← 特定上下文的决策
 │   └── billing/
 │       ├── GLOSSARY.md
 │       └── docs/adr/
 ```
 
-Create files lazily: only when you have something to write. If no `GLOSSARY.md` exists, create one when the first term is resolved. If no `docs/adr/` exists, create it when the first ADR is needed.
+按需创建文件：只有确实有内容要写时才创建。如果没有 `GLOSSARY.md`，在第一个术语确定时创建。如果没有 `docs/adr/`，在需要第一份架构决策记录（ADR）时创建。
 
-## During the session
+## 会话过程中
 
-### Challenge against the glossary
+### 对照术语表质疑用词
 
-When the user uses a term that conflicts with the existing language in `GLOSSARY.md`, call it out immediately. "Your glossary defines 'cancellation' as X, but you seem to mean Y. Which is it?"
+当用户使用的术语与 `GLOSSARY.md` 中的现有用语冲突时，立即指出。「术语表把『cancellation』定义为 X，但你似乎指的是 Y。究竟是哪一个？」
 
-### Sharpen fuzzy language
+### 澄清模糊用语
 
-When the user uses vague or overloaded terms, propose a precise canonical term. "You're saying 'account': do you mean the Customer or the User? Those are different things."
+当用户使用模糊或有多重含义的术语时，提出一个准确的规范术语。「你说的『account』是指 Customer 还是 User？它们是不同的概念。」
 
-### Discuss concrete scenarios
+### 讨论具体场景
 
-When domain relationships are being discussed, stress-test them with specific scenarios. Invent scenarios that probe edge cases and force the user to be precise about the boundaries between concepts.
+讨论领域关系时，用具体场景进行压力测试。构造能够探查边界情况的场景，促使用户准确说明概念之间的边界。
 
-### Cross-reference with code
+### 与代码交叉核对
 
-When the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible. Which is right?"
+当用户说明某个机制如何运作时，检查代码是否与之吻合。如果发现矛盾，明确指出：「代码取消的是整个 Orders，但你刚才说可以部分取消。哪一个才是正确的？」
 
-### Update GLOSSARY.md inline
+### 即时更新 GLOSSARY.md
 
-When a term is resolved, update `GLOSSARY.md` right there. Don't batch these up: capture them as they happen. Use the format in [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md).
+术语一旦确定，就立即更新 `GLOSSARY.md`。不要集中到最后处理：发生时就记录。采用 [GLOSSARY-FORMAT.md](./GLOSSARY-FORMAT.md) 中的格式。
 
-`GLOSSARY.md` should be totally devoid of implementation details. Do not treat `GLOSSARY.md` as a spec, a scratch pad, or a repository for implementation decisions. It is a glossary and nothing else.
+`GLOSSARY.md` 必须完全不含实现细节。不要把 `GLOSSARY.md` 当作规格说明、草稿本或存放实现决策的地方。它只是术语表，不承载其他内容。
 
-### Offer ADRs sparingly
+### 谨慎提议编写 ADR
 
-Only offer to create an ADR when all three are true:
+只有以下三项同时成立，才提议创建 ADR：
 
-1. **Hard to reverse**: the cost of changing your mind later is meaningful
-2. **Surprising without context**: a future reader will wonder "why did they do it this way?"
-3. **The result of a real trade-off**: there were genuine alternatives and you picked one for specific reasons
+1. **难以撤销**：以后改变主意需要付出显著成本。
+2. **缺少背景就令人费解**：未来的读者会问：「为什么要这样做？」
+3. **确实权衡过不同方案**：存在真正可行的替代方案，并且基于具体理由选定了其中一个。
 
-If any of the three is missing, skip the ADR. Use the format in [ADR-FORMAT.md](./ADR-FORMAT.md).
+缺少任何一项，就不写 ADR。采用 [ADR-FORMAT.md](./ADR-FORMAT.md) 中的格式。

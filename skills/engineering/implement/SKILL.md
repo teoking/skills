@@ -1,17 +1,19 @@
 ---
 name: implement
-description: "Implement a piece of work based on a spec or set of tickets."
+description: "根据规格说明或一组工单实现工作。"
 disable-model-invocation: true
 ---
 
-Implement the work described by the user in the spec or tickets.
+实现用户在规格说明（spec）或工单（ticket）中描述的工作。
 
-If the user passes a ticket reference, fetch it from the issue tracker and state its title before starting. If the reference is ambiguous, ask.
+本 fork 的输出偏好：默认用简体中文提问、解释和交付；用户指定其他语言时遵从用户。代码、命令、路径、工具名、技术标识及约定的模板字段遵循目标项目约定。
 
-Call the Skill tool with "tdd" where possible, at pre-agreed seams.
+如果用户传入工单引用，从工单跟踪器获取该工单，并在开始前说明工单标题。引用含糊时，向用户提问。
 
-Run typechecking regularly, single test files regularly, and the full test suite once at the end.
+在可行时，调用 Skill 工具，传入「tdd」，在事先约定的接缝（seam）处开展测试。
 
-Once done, call the Skill tool with "code-review" to review the work.
+经常运行类型检查和单个测试文件，最后运行一次完整测试套件。
 
-Commit your work to the current branch.
+完成后，调用 Skill 工具，传入「code-review」，审查本次工作。
+
+将本次工作提交到当前分支。
